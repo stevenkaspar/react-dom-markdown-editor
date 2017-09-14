@@ -2,6 +2,10 @@
 
 `npm install --save react-dom-markdown-editor`
 
+### Demo
+
+https://stevenkaspar.github.io/react-dom-markdown-editor/
+
 ### Example
 
 ```
