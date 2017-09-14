@@ -51,7 +51,7 @@ class App extends React.Component {
             { html: '<span style="background: aliceblue;">- list</span>',    handler: App.handleListClick },
             { label: 'h1',    handler: App.handleH1Click },
             { label: 'table', handler: App.handleTableClick },
-            { label: 'file',  handler: App.handleFileClick, is_file: true },
+            { label: 'file',  handler: App.handleFileClick, is_file: true }
           ]}
           value={this.state.value}
           onChange={this.markdownEditorChange}/>
@@ -59,6 +59,7 @@ class App extends React.Component {
         <button onClick={() => alert(marked(this.state.value))}>alert HTML output</button>
       </div>
     );
+  }
 
 };
 
