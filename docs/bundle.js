@@ -9837,7 +9837,7 @@ var App = function (_React$Component) {
     key: 'render',
     value: function render() {
       return _react2.default.createElement(_MarkdownEditor2.default, {
-        height: 100,
+        height: 400,
         toolbar: [{ label: 'h1', handler: App.handleH1Click }, { label: 'table', handler: App.handleTableClick }, { label: 'file', handler: this.handleFileClick, is_file: true }],
         value: this.state.value,
         onChange: this.markdownEditorChange });
