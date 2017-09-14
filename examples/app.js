@@ -43,8 +43,8 @@ class App extends React.Component {
       <MarkdownEditor
         height={100}
         toolbar={[
-          { label: 'h1',    handler: TaskMessages.handleH1Click },
-          { label: 'table', handler: TaskMessages.handleTableClick },
+          { label: 'h1',    handler: App.handleH1Click },
+          { label: 'table', handler: App.handleTableClick },
           { label: 'file',  handler: this.handleFileClick, is_file: true },
         ]}
         value={this.state.value}
