@@ -43,10 +43,10 @@ class App extends React.Component {
   }
 
   static handleH1Click(data, cb){
-    cb({ wrap: { start: '# ' } });
+    cb({ wrap: { start: '# ', end: '' } });
   }
   static handleListClick(data, cb){
-    cb({ wrap: { start: '- ' } });
+    cb({ wrap: { start: '- ', end: '' } });
   }
   static handleTableClick(data, cb){
     cb({ wrap: { start: '|',      end: '|b|\n|---|---|\n|1|2|' } });

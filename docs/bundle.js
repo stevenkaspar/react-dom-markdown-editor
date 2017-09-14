@@ -11166,12 +11166,12 @@ var App = function (_React$Component) {
   }, {
     key: 'handleH1Click',
     value: function handleH1Click(data, cb) {
-      cb({ wrap: { start: '# ' } });
+      cb({ wrap: { start: '# ', end: '' } });
     }
   }, {
     key: 'handleListClick',
     value: function handleListClick(data, cb) {
-      cb({ wrap: { start: '- ' } });
+      cb({ wrap: { start: '- ', end: '' } });
     }
   }, {
     key: 'handleTableClick',
