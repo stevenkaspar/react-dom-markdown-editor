@@ -1,7 +1,7 @@
 import React          from 'react';
 import ReactDOM       from 'react-dom';
-import MarkdownEditor from 'react-dom-markdown-editor';
-import 'react-dom-markdown-editor/lib/styles/base.css';
+import MarkdownEditor from '../src/MarkdownEditor';
+import '../src/styles/base.scss';
 
 class App extends React.Component {
   constructor() {
