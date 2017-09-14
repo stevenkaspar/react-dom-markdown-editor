@@ -8,10 +8,6 @@ let common_config = {
   module: {
     rules: [
       {
-        test: /prop-types/,
-        use: 'null-loader',
-      },
-      {
         test: /\.js$/,
         exclude: /(node_modules|bower_components)/,
         loader: "babel-loader",
@@ -42,13 +38,11 @@ let common_config = {
 let entry_outputs = {
   './src/MarkdownEditor.js': {
     path: `${__dirname}/lib`,
-    filename: `MarkdownEditor${isProduction ? '.min' : ''}.js`,
-    library: 'MarkdownEditor',
-    libraryTarget: 'umd',
+    filename: `MarkdownEditor.js`
   },
   './examples/app.js': {
     path: `${__dirname}/docs`,
-    filename: `bundle${isProduction ? '.min' : ''}.js`
+    filename: `bundle.js`
   }
 };
 
