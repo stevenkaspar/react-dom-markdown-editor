@@ -5,11 +5,13 @@
 ### Example
 
 ```
-import React from 'react';
-import MarkdownEditor from 'react-dom-markdown-editor';
-import 'react-dom-markdown-editor/lib/styles/base.css';
+import React          from 'react';
+import ReactDOM       from 'react-dom';
+import marked         from 'marked';
+import MarkdownEditor from '../src/MarkdownEditor';
+import '../src/styles/base.scss';
 
-export default class BasicComponent extends React.Component {
+class App extends React.Component {
   constructor() {
     super();
 
@@ -27,11 +29,11 @@ export default class BasicComponent extends React.Component {
     });
   }
 
-  handleFileClick({value, files}, cb){
+  static handleFileClick({value, files}, cb){
 
     let file_string = '';
     for(let file of files){
-      file_string += `[file.file_name](data:${file.file.type};base64,${file.data})`;
+      file_string += `[${file.file_name}](data:${file.file.type};base64,${file.data})`;
     }
 
     cb({ new_value: `${value}\n\n${file_string}` });
@@ -46,15 +48,20 @@ export default class BasicComponent extends React.Component {
 
   render(){
     return (
-      <MarkdownEditor
-        height={100}
-        toolbar={[
-          { label: 'h1',    handler: TaskMessages.handleH1Click },
-          { label: 'table', handler: TaskMessages.handleTableClick },
-          { label: 'file',  handler: this.handleFileClick, is_file: true },
-        ]}
-        value={this.state.value}
-        onChange={this.markdownEditorChange}/>
+      <div>
+        <h4>React Markdown Editor</h4>
+        <MarkdownEditor
+          height={400}
+          toolbar={[
+            { label: 'h1',    handler: App.handleH1Click },
+            { label: 'table', handler: App.handleTableClick },
+            { label: 'file',  handler: App.handleFileClick, is_file: true },
+          ]}
+          value={this.state.value}
+          onChange={this.markdownEditorChange}/>
+        <button onClick={() => alert(this.state.value)}>alert input value</button>
+        <button onClick={() => alert(marked(this.state.value))}>alert HTML output</button>
+      </div>
     );
   }
 
