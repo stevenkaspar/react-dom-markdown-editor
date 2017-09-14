@@ -1,0 +1,17 @@
+.react-dom-markdown-editor {
+  * {
+    box-sizing: border-box;
+  }
+
+  > .react-dom-markdown-editor-workspace {
+    display: flex;
+    flex-direction: row;
+
+    > * {
+      flex: 1;
+      border: 1px solid rgb(228, 228, 228);
+      padding: 10px;
+      overflow: auto;
+    }
+  }
+}

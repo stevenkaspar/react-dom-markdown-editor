@@ -1,0 +1,48 @@
+{
+  "name": "react-dom-markdown-editor",
+  "version": "0.0.0",
+  "description": "React Markdown Editor - includes easy props for adding file attachments, links, tables etc.",
+  "main": "index.js",
+  "scripts": {
+    "build": "rimraf lib && gulp",
+    "docs:publish": "cp docs/CNAME docs/_site && gh-pages -d docs/_site"
+  },
+  "files": [
+    "lib",
+    "index.js"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/stevenkaspar/react-dom-markdown-editor.git"
+  },
+  "keywords": [
+    "react",
+    "markdown",
+    "editor",
+    "files",
+    "links",
+    "lists"
+  ],
+  "author": "Steven Kaspar",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/stevenkaspar/react-dom-markdown-editor/issues"
+  },
+  "homepage": "https://github.com/stevenkaspar/react-dom-markdown-editor#readme",
+  "dependencies": {
+    "marked": "^0.3.6",
+    "react": "^15.6.1"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-plugin-transform-react-jsx": "^6.24.1",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
+    "css-loader": "^0.28.7",
+    "null-loader": "^0.1.1",
+    "rimraf": "^2.6.2",
+    "style-loader": "^0.18.2",
+    "webpack": "^3.5.6"
+  }
+}
