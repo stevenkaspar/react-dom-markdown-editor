@@ -4,7 +4,7 @@ const isProduction = process.env.NODE_ENV === 'production';
 const webpack = require('webpack');
 
 let common_config = {
-  devtool: 'source-map',
+  devtool: isProduction ? 'false' : 'source-map',
   module: {
     rules: [
       {
