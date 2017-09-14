@@ -41,7 +41,7 @@ class App extends React.Component {
   render(){
     return (
       <MarkdownEditor
-        height={100}
+        height={400}
         toolbar={[
           { label: 'h1',    handler: App.handleH1Click },
           { label: 'table', handler: App.handleTableClick },
