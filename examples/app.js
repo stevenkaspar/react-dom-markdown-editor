@@ -25,7 +25,7 @@ class App extends React.Component {
 
     let file_string = '';
     for(let file of files){
-      file_string += `[${file.file_name}](data:${file.file.type};base64,${file.data})`;
+      file_string += `[${file.file_name}](data:${file.file.type};base64,${file.data})\n\n`;
     }
 
     cb({ new_value: `${value}\n\n${file_string}` });
@@ -48,7 +48,7 @@ class App extends React.Component {
         <MarkdownEditor
           height={400}
           toolbar={[
-            { html: '<h3>list</h3>',    handler: App.handleListClick },
+            { html: '<span style="background: aliceblue;">- list</span>',    handler: App.handleListClick },
             { label: 'h1',    handler: App.handleH1Click },
             { label: 'table', handler: App.handleTableClick },
             { label: 'file',  handler: App.handleFileClick, is_file: true },
@@ -59,7 +59,6 @@ class App extends React.Component {
         <button onClick={() => alert(marked(this.state.value))}>alert HTML output</button>
       </div>
     );
-  }
 
 };
 

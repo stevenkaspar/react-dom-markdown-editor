@@ -59,7 +59,7 @@ class App extends React.Component {
         <MarkdownEditor
           height={400}
           toolbar={[
-            { html: '<h3>list</h3>',    handler: App.handleListClick },
+            { html: '<span style="background: aliceblue;">- list</span>',    handler: App.handleListClick },
             { label: 'h1',    handler: App.handleH1Click },
             { label: 'table', handler: App.handleTableClick },
             { label: 'file',  handler: App.handleFileClick, is_file: true },
