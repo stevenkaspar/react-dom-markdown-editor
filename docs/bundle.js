@@ -22258,8 +22258,14 @@ var MarkdownEditor = function (_React$Component) {
   return MarkdownEditor;
 }(_react2.default.Component);
 
-exports.default = MarkdownEditor;
 ;
+
+MarkdownEditor.propTypes = {
+  height: _react.PropTypes.number,
+  value: _react.PropTypes.string
+};
+
+exports.default = MarkdownEditor;
 
 /***/ }),
 /* 182 */

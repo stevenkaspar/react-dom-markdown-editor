@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import marked from 'marked';
 
 // configure markdown
@@ -12,7 +12,7 @@ import marked from 'marked';
   });
 })();
 
-export default class MarkdownEditor extends React.Component {
+class MarkdownEditor extends React.Component {
   constructor({value, height = 200}) {
     super();
 
@@ -278,3 +278,10 @@ export default class MarkdownEditor extends React.Component {
   }
 
 };
+
+MarkdownEditor.propTypes = {
+  height: PropTypes.number,
+  value:  PropTypes.string
+};
+
+export default MarkdownEditor;
