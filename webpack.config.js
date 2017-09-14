@@ -38,7 +38,9 @@ let common_config = {
 let entry_outputs = {
   './src/MarkdownEditor.js': {
     path: `${__dirname}/lib`,
-    filename: `MarkdownEditor.js`
+    filename: `MarkdownEditor.js`,
+    library: 'MarkdownEditor',
+    libraryTarget: 'umd'
   },
   './examples/app.js': {
     path: `${__dirname}/docs`,
