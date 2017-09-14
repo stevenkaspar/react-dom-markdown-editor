@@ -1,15 +1,10 @@
+'use strict';
+
 const isProduction = process.env.NODE_ENV === 'production';
 const webpack = require('webpack');
 
-module.exports = {
+let common_config = {
   devtool: 'source-map',
-  entry: './src/MarkdownEditor.js',
-  output: {
-    path: `${__dirname}/lib`,
-    filename: `MarkdownEditor${isProduction ? '.min' : ''}.js`,
-    library: 'MarkdownEditor',
-    libraryTarget: 'umd',
-  },
   module: {
     rules: [
       {
@@ -43,3 +38,29 @@ module.exports = {
     ],
   }
 };
+
+let entry_outputs = {
+  './src/MarkdownEditor.js': {
+    path: `${__dirname}/lib`,
+    filename: `MarkdownEditor${isProduction ? '.min' : ''}.js`,
+    library: 'MarkdownEditor',
+    libraryTarget: 'umd',
+  },
+  './examples/app.js': {
+    path: `${__dirname}/docs`,
+    filename: `bundle${isProduction ? '.min' : ''}.js`
+  }
+};
+
+exports = [];
+
+for(var entry in entry_outputs){
+  exports.push(
+    Object.assign({}, common_config, {
+      entry: entry,
+      output: entry_outputs[entry]
+    })
+  )
+}
+
+module.exports = exports;
