@@ -11084,7 +11084,6 @@ var App = function (_React$Component) {
     };
 
     _this.markdownEditorChange = _this.markdownEditorChange.bind(_this);
-    _this.handleFileClick = _this.handleFileClick.bind(_this);
     return _this;
   }
 
@@ -11096,6 +11095,40 @@ var App = function (_React$Component) {
       });
     }
   }, {
+    key: 'render',
+    value: function render() {
+      var _this2 = this;
+
+      return _react2.default.createElement(
+        'div',
+        null,
+        _react2.default.createElement(
+          'h4',
+          null,
+          'React Markdown Editor'
+        ),
+        _react2.default.createElement(_MarkdownEditor2.default, {
+          height: 400,
+          toolbar: [{ html: '<h3>list</h3>', handler: App.handleListClick }, { label: 'h1', handler: App.handleH1Click }, { label: 'table', handler: App.handleTableClick }, { label: 'file', handler: App.handleFileClick, is_file: true }],
+          value: this.state.value,
+          onChange: this.markdownEditorChange }),
+        _react2.default.createElement(
+          'button',
+          { onClick: function onClick() {
+              return alert(_this2.state.value);
+            } },
+          'alert input value'
+        ),
+        _react2.default.createElement(
+          'button',
+          { onClick: function onClick() {
+              return alert((0, _marked2.default)(_this2.state.value));
+            } },
+          'alert HTML output'
+        )
+      );
+    }
+  }], [{
     key: 'handleFileClick',
     value: function handleFileClick(_ref, cb) {
       var value = _ref.value,
@@ -11131,43 +11164,14 @@ var App = function (_React$Component) {
       cb({ new_value: value + '\n\n' + file_string });
     }
   }, {
-    key: 'render',
-    value: function render() {
-      var _this2 = this;
-
-      return _react2.default.createElement(
-        'div',
-        null,
-        _react2.default.createElement(
-          'h4',
-          null,
-          'React Markdown Editor'
-        ),
-        _react2.default.createElement(_MarkdownEditor2.default, {
-          height: 400,
-          toolbar: [{ label: 'h1', handler: App.handleH1Click }, { label: 'table', handler: App.handleTableClick }, { label: 'file', handler: this.handleFileClick, is_file: true }],
-          value: this.state.value,
-          onChange: this.markdownEditorChange }),
-        _react2.default.createElement(
-          'button',
-          { onClick: function onClick() {
-              return alert(_this2.state.value);
-            } },
-          'alert input value'
-        ),
-        _react2.default.createElement(
-          'button',
-          { onClick: function onClick() {
-              return alert((0, _marked2.default)(_this2.state.value));
-            } },
-          'alert HTML output'
-        )
-      );
-    }
-  }], [{
     key: 'handleH1Click',
     value: function handleH1Click(data, cb) {
-      cb({ wrap: { start: '# ', end: '' } });
+      cb({ wrap: { start: '# ' } });
+    }
+  }, {
+    key: 'handleListClick',
+    value: function handleListClick(data, cb) {
+      cb({ wrap: { start: '- ' } });
     }
   }, {
     key: 'handleTableClick',

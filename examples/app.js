@@ -13,7 +13,6 @@ class App extends React.Component {
     };
 
     this.markdownEditorChange = this.markdownEditorChange.bind(this);
-    this.handleFileClick        = this.handleFileClick.bind(this);
   }
 
   markdownEditorChange(value){
@@ -22,7 +21,7 @@ class App extends React.Component {
     });
   }
 
-  handleFileClick({value, files}, cb){
+  static handleFileClick({value, files}, cb){
 
     let file_string = '';
     for(let file of files){
@@ -33,7 +32,10 @@ class App extends React.Component {
   }
 
   static handleH1Click(data, cb){
-    cb({ wrap: { start: '# ',     end: '' } });
+    cb({ wrap: { start: '# ' } });
+  }
+  static handleListClick(data, cb){
+    cb({ wrap: { start: '- ' } });
   }
   static handleTableClick(data, cb){
     cb({ wrap: { start: '|',      end: '|b|\n|---|---|\n|1|2|' } });
@@ -46,9 +48,10 @@ class App extends React.Component {
         <MarkdownEditor
           height={400}
           toolbar={[
+            { html: '<h3>list</h3>',    handler: App.handleListClick },
             { label: 'h1',    handler: App.handleH1Click },
             { label: 'table', handler: App.handleTableClick },
-            { label: 'file',  handler: this.handleFileClick, is_file: true },
+            { label: 'file',  handler: App.handleFileClick, is_file: true },
           ]}
           value={this.state.value}
           onChange={this.markdownEditorChange}/>
