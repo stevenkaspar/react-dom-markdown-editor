@@ -8,8 +8,8 @@
 import React          from 'react';
 import ReactDOM       from 'react-dom';
 import marked         from 'marked';
-import MarkdownEditor from '../src/MarkdownEditor';
-import '../src/styles/base.scss';
+import MarkdownEditor from 'react-dom-markdown-editor';
+import 'react-dom-markdown-editor/styles/base.css';
 
 class App extends React.Component {
   constructor() {
