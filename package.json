@@ -1,6 +1,6 @@
 {
   "name": "react-dom-markdown-editor",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "React Markdown Editor - includes easy props for adding file attachments, links, tables etc.",
   "main": "index.js",
   "scripts": {
