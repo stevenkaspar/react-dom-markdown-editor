@@ -22,7 +22,11 @@ const paths = {
 	 */
 	webpack: {
 		config: 'webpack.config.js'
-	}
+	},
+  watch_dev_files: [
+    'examples/**/*',
+    'src/**/*',
+  ]
 };
 
 /** sass **/
@@ -52,6 +56,12 @@ gulp.task('webpack', done => {
 		console.log(`Error: ${data}`);
 	});
 	return webpack_process;
+});
+
+/** watch dev **/
+
+gulp.task('watch-dev', () => {
+	gulp.watch(paths.watch_dev_files, ['sass', 'webpack']);
 });
 
 

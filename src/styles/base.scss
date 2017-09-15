@@ -14,4 +14,12 @@
       overflow: auto;
     }
   }
+
+  textarea {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .react-dom-markdown-editor-preview {
+    overflow: auto;
+  }
 }

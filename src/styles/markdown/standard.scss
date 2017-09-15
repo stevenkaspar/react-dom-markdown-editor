@@ -1,0 +1,81 @@
+$general-padding: 10px;
+
+.react-dom-markdown-editor-preview {
+
+  font-family: Arial, sans-serif;
+
+  h1,h2,h3,h4,h5,h6 {
+    margin-bottom: $general-padding;
+  }
+  hr {
+    margin: $general-padding 0px;
+  }
+  p {
+    padding-bottom: $general-padding;
+  }
+  img {
+    max-width: 100%;
+  }
+  code {
+    background: rgb(238, 238, 238);
+    border: 1px solid rgb(220, 220, 220);
+    color: #a50000;
+    border-radius: 4px;
+    padding: 0px 4px;
+  }
+  pre code {
+    padding: 8px;
+    display: block;
+    margin-bottom: $general-padding;
+  }
+  ol {
+    padding-left: 0;
+    margin-left: 25px;
+    list-style-type: decimal;
+  }
+  ul {
+    padding-left: 0;
+    margin-left: 25px;
+    list-style-type: disc;
+  }
+  blockquote {
+    padding:       $general-padding;
+    margin-bottom: $general-padding;
+    margin-left:   0px;
+    border-left:   3px solid rgb(120, 166, 199);
+    background:    rgb(224, 242, 255);
+
+    p {
+      &:last-child {
+        padding-bottom: 0px;
+      }
+    }
+  }
+  table {
+    display: block;
+    width: 100%;
+    overflow: auto;
+    padding-bottom: $general-padding;
+    border-collapse: collapse;
+
+    th {
+      font-weight: 600;
+      padding: 6px 13px;
+      border: 1px solid #dfe2e5;
+    }
+    td {
+      padding: 6px 13px;
+      border: 1px solid #dfe2e5;
+    }
+    tr {
+      background-color: #fff;
+      border-top: 1px solid #c6cbd1;
+      &:nth-child(2n) {
+        background-color: #f6f8fa;
+      }
+    }
+    img {
+      background-color: transparent;
+    }
+  }
+}

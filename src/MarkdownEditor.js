@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import marked from 'marked';
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
 // configure markdown
 (() => {
@@ -204,29 +205,79 @@ class MarkdownEditor extends React.Component {
       }
     }
 
-    return jsx;
+    return (
+      <div className='react-dom-markdown-editor-toolbar' unselectable='on'>
+        { jsx }
+      </div>
+    );
+  }
+
+  getTextareaJSX(){
+    return (
+      <textarea ref={(textarea) => { this.textarea = textarea; }} className='react-dom-markdown-editor-textarea' onMouseDown={this.handleTextareaMouseDown} style={{height: `${this.state.height}px`}} value={this.state.value} onChange={this.markdownChange}></textarea>
+    );
+  }
+
+  getPreviewJSX(){
+    return (
+      <div className='react-dom-markdown-editor-preview' style={{height: `${this.state.height}px`}}
+        dangerouslySetInnerHTML={this.compileMarkdownToHTML(this.state.value)}>
+      </div>
+    );
+  }
+
+  getWorkspaceJSX(){
+    return (
+      <div className='react-dom-markdown-editor-workspace'>
+        { this.getTextareaJSX() }
+        { this.getPreviewJSX() }
+      </div>
+    );
+  }
+
+  getFooterJSX(){
+    return (
+      <div className='react-dom-markdown-editor-footer'>
+        <div style={{display: 'none'}} ref={(file_container) => { this.file_container = file_container; }}>
+          {this.state.file_inputs}
+        </div>
+      </div>
+    );
   }
 
   render(){
-    const style = {
-      height: `${this.state.height}px`
-    };
+
+    if(this.props.tabs){
+      return this.renderTabView();
+    }
+
     return (
       <div className='react-dom-markdown-editor'>
-        <div className='react-dom-markdown-editor-toolbar' unselectable='on'>
-          { this.getToolbarJSX() }
-        </div>
-        <div className='react-dom-markdown-editor-workspace'>
-          <textarea ref={(textarea) => { this.textarea = textarea; }} className='react-dom-markdown-editor-textarea' onMouseDown={this.handleTextareaMouseDown} style={style} value={this.state.value} onChange={this.markdownChange}></textarea>
-          <div className='react-dom-markdown-editor-preview' style={style}
-            dangerouslySetInnerHTML={this.compileMarkdownToHTML(this.state.value)}>
-          </div>
-        </div>
-        <div className='react-dom-markdown-editor-footer'>
-          <div style={{display: 'none'}} ref={(file_container) => { this.file_container = file_container; }}>
-            {this.state.file_inputs}
-          </div>
-        </div>
+        { this.getToolbarJSX() }
+        { this.getWorkspaceJSX() }
+        { this.getFooterJSX() }
+      </div>
+    );
+  }
+
+  renderTabView(){
+    return (
+      <div className='react-dom-markdown-editor'>
+        <Tabs>
+          <TabList>
+            <Tab>Markdown</Tab>
+            <Tab>Preview</Tab>
+          </TabList>
+
+          <TabPanel>
+            { this.getToolbarJSX() }
+            { this.getTextareaJSX() }
+          </TabPanel>
+          <TabPanel>
+            { this.getPreviewJSX() }
+          </TabPanel>
+          { this.getFooterJSX() }
+        </Tabs>
       </div>
     );
   }

@@ -1,0 +1,24 @@
+$primary: rgb(39, 209, 138);
+
+* {
+  padding: 0;
+  margin: 0;
+}
+
+
+.btn {
+  outline: none;
+  border: none;
+  background: none;
+
+  &.radio-btn {
+    padding: 10px;
+    background: lighten($primary, 20);
+    color:      darken($primary, 30);
+
+    &.selected {
+      background: $primary;
+      box-shadow: 0 0 2px #4e4e4e inset;
+    }
+  }
+}

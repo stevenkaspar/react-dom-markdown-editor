@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "rimraf lib && gulp",
+    "dev": "gulp watch-dev",
     "docs:publish": "cp docs/CNAME docs/_site && gh-pages -d docs/_site"
   },
   "files": [
@@ -31,7 +32,8 @@
   "homepage": "https://github.com/stevenkaspar/react-dom-markdown-editor#readme",
   "dependencies": {
     "marked": "^0.3.6",
-    "react": "^15.6.1"
+    "react": "^15.6.1",
+    "react-tabs": "^2.0.0"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
