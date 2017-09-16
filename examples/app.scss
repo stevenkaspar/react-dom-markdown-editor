@@ -1,6 +1,7 @@
-$primary:     rgb(39, 209, 138);
 $gray:        #e2e5ea;
 $gray-darker: #b2b8c3;
+$gray-darkest: #8a92a0;
+
 $sans-serif:  Arial, sans-serif;
 $font-size:   14px;
 
@@ -23,6 +24,12 @@ html {
 header {
   background: $gray;
   color:      $gray-darker;
+
+  a,
+  a:hover,
+  a:visited {
+    color: $gray-darker;
+  }
 }
 
 .btn {
@@ -34,6 +41,10 @@ header {
   padding: 10px;
   background: $button-background;
   color:      $button-color;
+
+  &.btn-tight {
+    padding: 4px;
+  }
 
 
   &:hover {
@@ -83,6 +94,14 @@ header {
 
 @each $align in (left, center, right){
   .text-#{$align} {text-align: $align}
+}
+
+@each $label, $color in (
+  gray-darker: $gray-darker,
+  gray-darkest: $gray-darkest,
+) {
+  .text-#{$label} {color: $color}
+  .bg-#{$label}   {background: $color}
 }
 
 @each $rule, $abbr in (padding: 'p', margin: 'm'){

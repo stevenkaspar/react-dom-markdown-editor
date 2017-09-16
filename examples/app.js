@@ -8,6 +8,7 @@ import html2canvas    from 'html2canvas';
 
 let styles = {
   app:      require('./app.scss').toString(),
+  flex:     require('../src/styles/flex.scss').toString(),
   base:     require('../src/styles/base.scss').toString(),
   tabs:     require('react-tabs/style/react-tabs.scss').toString(),
   standard: require('../src/styles/markdown/standard.scss').toString()
@@ -21,8 +22,7 @@ class App extends React.Component {
     super();
 
     this.state = {
-      value: `
-### react-dom-markdown-editor
+      value: `### react-dom-markdown-editor
 
 here is some \`inline code\`
 
@@ -32,10 +32,20 @@ here is some \`inline code\`
 
 |Column 1|Column 2|
 |---|---|
-|Data 1| Data 2|
-      `,
+|Data 1| Data 2|`,
       view: 'basic',
-      markdown_style: 'standard'
+      markdown_style: 'standard',
+      height_radio: 'flex'
+    };
+
+    // marked options
+    let renderer = new marked.Renderer();
+    renderer.link = (href, title, text) => {
+      return `<a href="${href}" target="_blank" title="${title}">${text}</a>`;
+    }
+
+    this.marked_options = {
+      renderer: renderer
     };
 
     this.markdownEditorChange = this.markdownEditorChange.bind(this);
@@ -60,71 +70,91 @@ here is some \`inline code\`
   static handleH1Click(data, cb){
     cb({ wrap: { start: '# ' , end: ''} });
   }
+  static handleH3Click(data, cb){
+    cb({ wrap: { start: '### ' , end: ''} });
+  }
+  static handleHRClick(data, cb){
+    cb({ wrap: { start: '' , end: '---\n\n'} });
+  }
   static handleListClick(data, cb){
     cb({ wrap: { start: '- ' , end: ''} });
+  }
+  static handleNumberedListClick(data, cb){
+    cb({ wrap: { start: '1. ' , end: ''} });
   }
   static handleTableClick(data, cb){
     cb({ wrap: { start: '|',      end: '|b|\n|---|---|\n|1|2|' } });
   }
 
   render(){
+    const btn_class = 'btn btn-tight mx-4 mb-4';
     const toolbar = [
-      { label: '-    list',   handler: App.handleListClick },
-      { label: '#    h1',     handler: App.handleH1Click },
-      { label: '|-|  table',  handler: App.handleTableClick },
-      { label: '![]() image', handler: App.handleImageClick, is_file: true }
+      { label: '-    list',   handler: App.handleListClick,                 className: btn_class },
+      { label: '1.   numbered list',   handler: App.handleNumberedListClick,    className: btn_class },
+      { label: '#    h1',     handler: App.handleH1Click,                   className: btn_class },
+      { label: '###  h3',     handler: App.handleH3Click,                   className: btn_class },
+      { label: '---  hr',     handler: App.handleHRClick,                   className: btn_class },
+      { label: '|-|  table',  handler: App.handleTableClick,                className: btn_class },
+      { label: '![]() image', handler: App.handleImageClick, is_file: true, className: btn_class }
     ];
 
     return (
       <div>
         <style>{styles.app}</style>
         <style>{styles.base}</style>
+
+        { this.state.view === 'tabs' ? <style>{styles.tabs}</style> : null }
+        <style>{styles[this.state.markdown_style]}</style>
+        { this.state.height_radio === 'flex' ? <style>{styles.flex}</style> : null }
+
         <div className='flex-column absolute-full'>
           <header className='flex-none text-right p-4'>
             <h1>React Markdown Editor</h1>
+            <span>{'<'}♥{'/>'} by <a href='https://www.linkedin.com/in/stevenkaspar/' target='_blank'>Steven Kaspar</a></span>
           </header>
-          <div className='flex-none flex-row justify-content-between py-10 px-4'>
+          <div className='flex-none flex-row justify-content-between py-10 px-4 bg-gray-darkest mb-4'>
             <div>
               <div className='radio-group mr-10'>
                 <label>View</label>
                 <button className={`btn radio-btn ${this.state.view === 'basic' ? 'selected' : ''}`} onClick={() => this.setState({ view: 'basic' })}>Side by Side</button>
                 <button className={`btn radio-btn ${this.state.view === 'tabs' ? 'selected' : ''}`} onClick={() => this.setState({ view: 'tabs' })}>Tabs</button>
               </div>
-              <div className='radio-group'>
+              <div className='radio-group mr-10'>
                 <label>Markdown Style</label>
                 <button className={`btn radio-btn ${this.state.markdown_style === 'standard' ? 'selected' : ''}`} onClick={() => this.setState({ markdown_style: 'standard' })}>Standard</button>
                 <button className={`btn radio-btn ${this.state.markdown_style === null ? 'selected' : ''}`} onClick={() => this.setState({ markdown_style: null })}>None</button>
+              </div>
+              <div className='radio-group'>
+                <label>Height</label>
+                <button className={`btn radio-btn ${this.state.height_radio === 'flex' ? 'selected' : ''}`} onClick={() => this.setState({ height_radio: 'flex' })}>Flex Auto</button>
+                <button className={`btn radio-btn ${this.state.height_radio === 'fixed' ? 'selected' : ''}`} onClick={() => this.setState({ height_radio: 'fixed' })}>Fixed</button>
               </div>
             </div>
             <div>
               <button className='btn mr-10' onClick={() => App.htmlToPdf('<div class="react-dom-markdown-editor-preview">'+marked(this.state.value) + `<style>${styles[this.state.markdown_style]}</style>`+'</div>')}>download PDF</button>
               <button className='btn' onClick={() => App.copyTextToClipboard(marked(this.state.value))}>copy HTML output</button>
             </div>
-            <style>{styles[this.state.markdown_style]}</style>
           </div>
-          <div className='flex-auto overflow-auto'>
+          <div className='flex-auto overflow-auto flex-column'>
           {
             this.state.view === 'basic' ?
-            <div>
               <MarkdownEditor
                 height={400}
+                marked_options={this.marked_options}
                 toolbar={toolbar}
                 value={this.state.value}
                 onChange={this.markdownEditorChange}/>
-            </div>
               : null
           }
           {
             this.state.view === 'tabs' ?
-            <div>
-              <style>{styles.tabs}</style>
               <MarkdownEditor
                 height={400}
+                marked_options={this.marked_options}
                 tabs={true}
                 toolbar={toolbar}
                 value={this.state.value}
                 onChange={this.markdownEditorChange}/>
-            </div>
               : null
           }
           </div>

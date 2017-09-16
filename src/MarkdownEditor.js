@@ -1,20 +1,10 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import marked from 'marked';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
-// configure markdown
-(() => {
-  let renderer = new marked.Renderer();
-  renderer.link = (href, title, text) => {
-    return `<a href="${href}" target="_blank" title="${title}">${text}</a>`;
-  }
-  marked.setOptions({
-    renderer: renderer
-  });
-})();
-
 class MarkdownEditor extends React.Component {
-  constructor({value, height = 200}) {
+  constructor({value, height = '', marked_options = {}}) {
     super();
 
     this.state = {
@@ -23,6 +13,8 @@ class MarkdownEditor extends React.Component {
       file_inputs: []
     };
 
+    this.setMarkedOptions(marked_options);
+
     this.markdownChange = this.markdownChange.bind(this);
     this.toolbarButtonMouseDown = this.toolbarButtonMouseDown.bind(this);
     this.toolbarButtonMouseUp = this.toolbarButtonMouseUp.bind(this);
@@ -30,6 +22,37 @@ class MarkdownEditor extends React.Component {
     this.handleTextareaMouseDown       = this.handleTextareaMouseDown.bind(this);
     this.handleMouseMoveAfterMouseDown = this.handleMouseMoveAfterMouseDown.bind(this);
     this.handleMouseUpAfterMouseDown   = this.handleMouseUpAfterMouseDown.bind(this);
+  }
+
+  get tool_callback_data(){
+
+    let selection = MarkdownEditor.getInputSelection(this.textarea);
+
+    return {
+      value:     this.textarea.innerHTML,
+      selection: {
+        ...selection,
+        _:     selection
+      },
+      target:    this.textarea
+    };
+  }
+
+  get style_height(){
+    if(typeof this.state.height === 'undefined'){
+      return 'auto'
+    }
+    else if(typeof this.state.height === 'number'){
+      return `${this.state.height}px`;
+    }
+    else if(typeof this.state.height === 'string'){
+      return this.state.height;
+    }
+    return 'auto';
+  }
+
+  setMarkedOptions(options){
+    marked.setOptions(options);
   }
 
   componentWillReceiveProps(new_props){
@@ -128,20 +151,6 @@ class MarkdownEditor extends React.Component {
 
   }
 
-  get tool_callback_data(){
-
-    let selection = MarkdownEditor.getInputSelection(this.textarea);
-
-    return {
-      value:     this.textarea.innerHTML,
-      selection: {
-        ...selection,
-        _:     selection
-      },
-      target:    this.textarea
-    };
-  }
-
   /**
    * Callback function that will be called by the toolbar.handler functions
    *
@@ -188,6 +197,7 @@ class MarkdownEditor extends React.Component {
       if(tool.label){
         jsx.push(
           <button
+            className={tool.className}
             key={index++}
             onMouseDown={this.toolbarButtonMouseDown}
             onMouseUp={event => this.toolbarButtonMouseUp(event, tool)}
@@ -197,6 +207,7 @@ class MarkdownEditor extends React.Component {
       else if(tool.html){
         jsx.push(
           <span
+            className={tool.className}
             key={index++}
             onMouseDown={this.toolbarButtonMouseDown}
             onMouseUp={event => this.toolbarButtonMouseUp(event, tool)}
@@ -214,13 +225,13 @@ class MarkdownEditor extends React.Component {
 
   getTextareaJSX(){
     return (
-      <textarea ref={(textarea) => { this.textarea = textarea; }} className='react-dom-markdown-editor-textarea' onMouseDown={this.handleTextareaMouseDown} style={{height: `${this.state.height}px`}} value={this.state.value} onChange={this.markdownChange}></textarea>
+      <textarea ref={(textarea) => { this.textarea = textarea; }} className='react-dom-markdown-editor-textarea' onMouseDown={this.handleTextareaMouseDown} style={{height: this.style_height}} value={this.state.value} onChange={this.markdownChange}></textarea>
     );
   }
 
   getPreviewJSX(){
     return (
-      <div className='react-dom-markdown-editor-preview' style={{height: `${this.state.height}px`}}
+      <div className='react-dom-markdown-editor-preview' style={{height: this.style_height}}
         dangerouslySetInnerHTML={this.compileMarkdownToHTML(this.state.value)}>
       </div>
     );
@@ -265,8 +276,8 @@ class MarkdownEditor extends React.Component {
       <div className='react-dom-markdown-editor'>
         <Tabs>
           <TabList>
-            <Tab>Markdown</Tab>
-            <Tab>Preview</Tab>
+            <Tab>{this.props.markdown_tab_label ? this.props.markdown_tab_label : 'Markdown'}</Tab>
+            <Tab>{this.props.preview_tab_label ?  this.props.preview_tab_label  : 'Preview'}</Tab>
           </TabList>
 
           <TabPanel>
@@ -331,8 +342,20 @@ class MarkdownEditor extends React.Component {
 };
 
 MarkdownEditor.propTypes = {
-  height: PropTypes.number,
-  value:  PropTypes.string
+  height:             PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+  value:              PropTypes.string,
+  marked_options:     PropTypes.object,
+  toolbar:            PropTypes.arrayOf(PropTypes.shape({
+    className:          PropTypes.string,
+    html:               PropTypes.string,
+    label:              PropTypes.string,
+    handler:            PropTypes.func.isRequired,
+    is_file:            PropTypes.bool
+  })),
+  tabs:               PropTypes.bool,
+  onChange:           PropTypes.func,
+  markdown_tab_label: PropTypes.string,
+  preview_tab_label:  PropTypes.string
 };
 
 export default MarkdownEditor;

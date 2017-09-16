@@ -1286,7 +1286,7 @@ var CallbackQueue = __webpack_require__(68);
 var PooledClass = __webpack_require__(16);
 var ReactFeatureFlags = __webpack_require__(69);
 var ReactReconciler = __webpack_require__(19);
-var Transaction = __webpack_require__(29);
+var Transaction = __webpack_require__(30);
 
 var invariant = __webpack_require__(1);
 
@@ -2038,7 +2038,7 @@ var _assign = __webpack_require__(4);
 var ReactCurrentOwner = __webpack_require__(10);
 
 var warning = __webpack_require__(2);
-var canDefineProperty = __webpack_require__(26);
+var canDefineProperty = __webpack_require__(27);
 var hasOwnProperty = Object.prototype.hasOwnProperty;
 
 var REACT_ELEMENT_TYPE = __webpack_require__(59);
@@ -2516,7 +2516,7 @@ var cloneElement = ReactElement.cloneElement;
 
 if (process.env.NODE_ENV !== 'production') {
   var lowPriorityWarning = __webpack_require__(37);
-  var canDefineProperty = __webpack_require__(26);
+  var canDefineProperty = __webpack_require__(27);
   var ReactElementValidator = __webpack_require__(61);
   var didWarnPropTypesDeprecated = false;
   createElement = ReactElementValidator.createElement;
@@ -2853,7 +2853,7 @@ module.exports = ReactReconciler;
 
 
 var DOMNamespaces = __webpack_require__(45);
-var setInnerHTML = __webpack_require__(31);
+var setInnerHTML = __webpack_require__(32);
 
 var createMicrosoftUnsafeLocalFunction = __webpack_require__(46);
 var setTextContent = __webpack_require__(73);
@@ -2962,6 +2962,43 @@ module.exports = DOMLazyTree;
 /* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
+/* WEBPACK VAR INJECTION */(function(process) {/**
+ * Copyright 2013-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ */
+
+if (process.env.NODE_ENV !== 'production') {
+  var REACT_ELEMENT_TYPE = (typeof Symbol === 'function' &&
+    Symbol.for &&
+    Symbol.for('react.element')) ||
+    0xeac7;
+
+  var isValidElement = function(object) {
+    return typeof object === 'object' &&
+      object !== null &&
+      object.$$typeof === REACT_ELEMENT_TYPE;
+  };
+
+  // By explicitly using `prop-types` you are opting into new development behavior.
+  // http://fb.me/prop-types-in-prod
+  var throwOnDirectAccess = true;
+  module.exports = __webpack_require__(63)(isValidElement, throwOnDirectAccess);
+} else {
+  // By explicitly using `prop-types` you are opting into new production behavior.
+  // http://fb.me/prop-types-in-prod
+  module.exports = __webpack_require__(195)();
+}
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
 "use strict";
 /* WEBPACK VAR INJECTION */(function(process) {/**
  * Copyright 2013-present, Facebook, Inc.
@@ -2975,7 +3012,7 @@ module.exports = DOMLazyTree;
 
 
 
-var EventPluginHub = __webpack_require__(22);
+var EventPluginHub = __webpack_require__(23);
 var EventPluginUtils = __webpack_require__(39);
 
 var accumulateInto = __webpack_require__(65);
@@ -3099,7 +3136,7 @@ module.exports = EventPropagators;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3117,7 +3154,7 @@ module.exports = EventPropagators;
 
 var _prodInvariant = __webpack_require__(3);
 
-var EventPluginRegistry = __webpack_require__(28);
+var EventPluginRegistry = __webpack_require__(29);
 var EventPluginUtils = __webpack_require__(39);
 var ReactErrorUtils = __webpack_require__(40);
 
@@ -3379,7 +3416,7 @@ module.exports = EventPluginHub;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3443,7 +3480,7 @@ SyntheticEvent.augmentClass(SyntheticUIEvent, UIEventInterface);
 module.exports = SyntheticUIEvent;
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3494,44 +3531,89 @@ var ReactInstanceMap = {
 module.exports = ReactInstanceMap;
 
 /***/ }),
-/* 25 */
-/***/ (function(module, exports, __webpack_require__) {
+/* 26 */
+/***/ (function(module, exports) {
 
-/* WEBPACK VAR INJECTION */(function(process) {/**
- * Copyright 2013-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
- */
+/*
+	MIT License http://www.opensource.org/licenses/mit-license.php
+	Author Tobias Koppers @sokra
+*/
+// css base code, injected by the css-loader
+module.exports = function(useSourceMap) {
+	var list = [];
 
-if (process.env.NODE_ENV !== 'production') {
-  var REACT_ELEMENT_TYPE = (typeof Symbol === 'function' &&
-    Symbol.for &&
-    Symbol.for('react.element')) ||
-    0xeac7;
+	// return the list of modules as css string
+	list.toString = function toString() {
+		return this.map(function (item) {
+			var content = cssWithMappingToString(item, useSourceMap);
+			if(item[2]) {
+				return "@media " + item[2] + "{" + content + "}";
+			} else {
+				return content;
+			}
+		}).join("");
+	};
 
-  var isValidElement = function(object) {
-    return typeof object === 'object' &&
-      object !== null &&
-      object.$$typeof === REACT_ELEMENT_TYPE;
-  };
+	// import a list of modules into the list
+	list.i = function(modules, mediaQuery) {
+		if(typeof modules === "string")
+			modules = [[null, modules, ""]];
+		var alreadyImportedModules = {};
+		for(var i = 0; i < this.length; i++) {
+			var id = this[i][0];
+			if(typeof id === "number")
+				alreadyImportedModules[id] = true;
+		}
+		for(i = 0; i < modules.length; i++) {
+			var item = modules[i];
+			// skip already imported module
+			// this implementation is not 100% perfect for weird media query combinations
+			//  when a module is imported multiple times with different media queries.
+			//  I hope this will never occur (Hey this way we have smaller bundles)
+			if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
+				if(mediaQuery && !item[2]) {
+					item[2] = mediaQuery;
+				} else if(mediaQuery) {
+					item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
+				}
+				list.push(item);
+			}
+		}
+	};
+	return list;
+};
 
-  // By explicitly using `prop-types` you are opting into new development behavior.
-  // http://fb.me/prop-types-in-prod
-  var throwOnDirectAccess = true;
-  module.exports = __webpack_require__(63)(isValidElement, throwOnDirectAccess);
-} else {
-  // By explicitly using `prop-types` you are opting into new production behavior.
-  // http://fb.me/prop-types-in-prod
-  module.exports = __webpack_require__(197)();
+function cssWithMappingToString(item, useSourceMap) {
+	var content = item[1] || '';
+	var cssMapping = item[3];
+	if (!cssMapping) {
+		return content;
+	}
+
+	if (useSourceMap && typeof btoa === 'function') {
+		var sourceMapping = toComment(cssMapping);
+		var sourceURLs = cssMapping.sources.map(function (source) {
+			return '/*# sourceURL=' + cssMapping.sourceRoot + source + ' */'
+		});
+
+		return [content].concat(sourceURLs).concat([sourceMapping]).join('\n');
+	}
+
+	return [content].join('\n');
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+// Adapted from convert-source-map (MIT)
+function toComment(sourceMap) {
+	// eslint-disable-next-line no-undef
+	var base64 = btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap))));
+	var data = 'sourceMappingURL=data:application/json;charset=utf-8;base64,' + base64;
+
+	return '/*# ' + data + ' */';
+}
+
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3563,7 +3645,7 @@ module.exports = canDefineProperty;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3589,7 +3671,7 @@ module.exports = emptyObject;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3848,7 +3930,7 @@ module.exports = EventPluginRegistry;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4082,7 +4164,7 @@ module.exports = TransactionImpl;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4098,7 +4180,7 @@ module.exports = TransactionImpl;
 
 
 
-var SyntheticUIEvent = __webpack_require__(23);
+var SyntheticUIEvent = __webpack_require__(24);
 var ViewportMetrics = __webpack_require__(72);
 
 var getEventModifierState = __webpack_require__(43);
@@ -4159,7 +4241,7 @@ SyntheticUIEvent.augmentClass(SyntheticMouseEvent, MouseEventInterface);
 module.exports = SyntheticMouseEvent;
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4262,7 +4344,7 @@ if (ExecutionEnvironment.canUseDOM) {
 module.exports = setInnerHTML;
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4389,7 +4471,7 @@ function escapeTextContentForBrowser(text) {
 module.exports = escapeTextContentForBrowser;
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4407,7 +4489,7 @@ module.exports = escapeTextContentForBrowser;
 
 var _assign = __webpack_require__(4);
 
-var EventPluginRegistry = __webpack_require__(28);
+var EventPluginRegistry = __webpack_require__(29);
 var ReactEventEmitterMixin = __webpack_require__(143);
 var ViewportMetrics = __webpack_require__(72);
 
@@ -4718,7 +4800,7 @@ var ReactBrowserEventEmitter = _assign({}, ReactEventEmitterMixin, {
 module.exports = ReactBrowserEventEmitter;
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4741,7 +4823,7 @@ function isTabList(el) {
 }
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -4793,88 +4875,6 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
 		window.classNames = classNames;
 	}
 }());
-
-
-/***/ }),
-/* 36 */
-/***/ (function(module, exports) {
-
-/*
-	MIT License http://www.opensource.org/licenses/mit-license.php
-	Author Tobias Koppers @sokra
-*/
-// css base code, injected by the css-loader
-module.exports = function(useSourceMap) {
-	var list = [];
-
-	// return the list of modules as css string
-	list.toString = function toString() {
-		return this.map(function (item) {
-			var content = cssWithMappingToString(item, useSourceMap);
-			if(item[2]) {
-				return "@media " + item[2] + "{" + content + "}";
-			} else {
-				return content;
-			}
-		}).join("");
-	};
-
-	// import a list of modules into the list
-	list.i = function(modules, mediaQuery) {
-		if(typeof modules === "string")
-			modules = [[null, modules, ""]];
-		var alreadyImportedModules = {};
-		for(var i = 0; i < this.length; i++) {
-			var id = this[i][0];
-			if(typeof id === "number")
-				alreadyImportedModules[id] = true;
-		}
-		for(i = 0; i < modules.length; i++) {
-			var item = modules[i];
-			// skip already imported module
-			// this implementation is not 100% perfect for weird media query combinations
-			//  when a module is imported multiple times with different media queries.
-			//  I hope this will never occur (Hey this way we have smaller bundles)
-			if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
-				if(mediaQuery && !item[2]) {
-					item[2] = mediaQuery;
-				} else if(mediaQuery) {
-					item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
-				}
-				list.push(item);
-			}
-		}
-	};
-	return list;
-};
-
-function cssWithMappingToString(item, useSourceMap) {
-	var content = item[1] || '';
-	var cssMapping = item[3];
-	if (!cssMapping) {
-		return content;
-	}
-
-	if (useSourceMap && typeof btoa === 'function') {
-		var sourceMapping = toComment(cssMapping);
-		var sourceURLs = cssMapping.sources.map(function (source) {
-			return '/*# sourceURL=' + cssMapping.sourceRoot + source + ' */'
-		});
-
-		return [content].concat(sourceURLs).concat([sourceMapping]).join('\n');
-	}
-
-	return [content].join('\n');
-}
-
-// Adapted from convert-source-map (MIT)
-function toComment(sourceMap) {
-	// eslint-disable-next-line no-undef
-	var base64 = btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap))));
-	var data = 'sourceMappingURL=data:application/json;charset=utf-8;base64,' + base64;
-
-	return '/*# ' + data + ' */';
-}
 
 
 /***/ }),
@@ -5459,7 +5459,7 @@ var ReactDOMComponentTree = __webpack_require__(5);
 var ReactInstrumentation = __webpack_require__(9);
 
 var createMicrosoftUnsafeLocalFunction = __webpack_require__(46);
-var setInnerHTML = __webpack_require__(31);
+var setInnerHTML = __webpack_require__(32);
 var setTextContent = __webpack_require__(73);
 
 function getNodeAfter(parentNode, node) {
@@ -6128,7 +6128,7 @@ module.exports = KeyEscapeUtils;
 var _prodInvariant = __webpack_require__(3);
 
 var ReactCurrentOwner = __webpack_require__(10);
-var ReactInstanceMap = __webpack_require__(24);
+var ReactInstanceMap = __webpack_require__(25);
 var ReactInstrumentation = __webpack_require__(9);
 var ReactUpdates = __webpack_require__(11);
 
@@ -6825,7 +6825,7 @@ exports.deepForEach = deepForEach;
 
 var _react = __webpack_require__(13);
 
-var _elementTypes = __webpack_require__(34);
+var _elementTypes = __webpack_require__(35);
 
 function isTabChild(child) {
   return (0, _elementTypes.isTab)(child) || (0, _elementTypes.isTabList)(child) || (0, _elementTypes.isTabPanel)(child);
@@ -6889,8 +6889,8 @@ var _prodInvariant = __webpack_require__(18),
 
 var ReactNoopUpdateQueue = __webpack_require__(58);
 
-var canDefineProperty = __webpack_require__(26);
-var emptyObject = __webpack_require__(27);
+var canDefineProperty = __webpack_require__(27);
+var emptyObject = __webpack_require__(28);
 var invariant = __webpack_require__(1);
 var lowPriorityWarning = __webpack_require__(37);
 
@@ -7218,7 +7218,7 @@ var ReactElement = __webpack_require__(15);
 
 var checkReactTypeSpec = __webpack_require__(99);
 
-var canDefineProperty = __webpack_require__(26);
+var canDefineProperty = __webpack_require__(27);
 var getIteratorFn = __webpack_require__(60);
 var warning = __webpack_require__(2);
 var lowPriorityWarning = __webpack_require__(37);
@@ -8542,8 +8542,8 @@ module.exports = ViewportMetrics;
 
 
 var ExecutionEnvironment = __webpack_require__(6);
-var escapeTextContentForBrowser = __webpack_require__(32);
-var setInnerHTML = __webpack_require__(31);
+var escapeTextContentForBrowser = __webpack_require__(33);
+var setInnerHTML = __webpack_require__(32);
 
 /**
  * Set the textContent property of a node, ensuring that whitespace is preserved
@@ -9990,23 +9990,23 @@ var _prodInvariant = __webpack_require__(3);
 var DOMLazyTree = __webpack_require__(20);
 var DOMProperty = __webpack_require__(14);
 var React = __webpack_require__(17);
-var ReactBrowserEventEmitter = __webpack_require__(33);
+var ReactBrowserEventEmitter = __webpack_require__(34);
 var ReactCurrentOwner = __webpack_require__(10);
 var ReactDOMComponentTree = __webpack_require__(5);
 var ReactDOMContainerInfo = __webpack_require__(184);
 var ReactDOMFeatureFlags = __webpack_require__(185);
 var ReactFeatureFlags = __webpack_require__(69);
-var ReactInstanceMap = __webpack_require__(24);
+var ReactInstanceMap = __webpack_require__(25);
 var ReactInstrumentation = __webpack_require__(9);
 var ReactMarkupChecksum = __webpack_require__(186);
 var ReactReconciler = __webpack_require__(19);
 var ReactUpdateQueue = __webpack_require__(52);
 var ReactUpdates = __webpack_require__(11);
 
-var emptyObject = __webpack_require__(27);
+var emptyObject = __webpack_require__(28);
 var instantiateReactComponent = __webpack_require__(79);
 var invariant = __webpack_require__(1);
-var setInnerHTML = __webpack_require__(31);
+var setInnerHTML = __webpack_require__(32);
 var shouldUpdateReactComponent = __webpack_require__(50);
 var warning = __webpack_require__(2);
 
@@ -11857,7 +11857,7 @@ exports.selectedIndexPropType = selectedIndexPropType;
 
 var _childrenDeepMap = __webpack_require__(56);
 
-var _elementTypes = __webpack_require__(34);
+var _elementTypes = __webpack_require__(35);
 
 function childrenPropType(props, propName, componentName) {
   var error = void 0;
@@ -11958,7 +11958,7 @@ exports.getPanelsCount = getPanelsCount;
 
 var _childrenDeepMap = __webpack_require__(56);
 
-var _elementTypes = __webpack_require__(34);
+var _elementTypes = __webpack_require__(35);
 
 function getTabsCount(children) {
   var tabCount = 0;
@@ -12021,9 +12021,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var styles = {
   app: __webpack_require__(206).toString(),
-  base: __webpack_require__(207).toString(),
-  tabs: __webpack_require__(208).toString(),
-  standard: __webpack_require__(209).toString()
+  flex: __webpack_require__(207).toString(),
+  base: __webpack_require__(208).toString(),
+  tabs: __webpack_require__(209).toString(),
+  standard: __webpack_require__(210).toString()
 
   // const base_scss =  require('./styles/base.scss').toString();
   // console.log(base_scss);
@@ -12038,9 +12039,20 @@ var App = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this));
 
     _this.state = {
-      value: '\n### react-dom-markdown-editor\n\nhere is some `inline code`\n\n> a quote\n\n[some link](#)\n\n|Column 1|Column 2|\n|---|---|\n|Data 1| Data 2|\n      ',
+      value: '### react-dom-markdown-editor\n\nhere is some `inline code`\n\n> a quote\n\n[some link](#)\n\n|Column 1|Column 2|\n|---|---|\n|Data 1| Data 2|',
       view: 'basic',
-      markdown_style: 'standard'
+      markdown_style: 'standard',
+      height_radio: 'flex'
+    };
+
+    // marked options
+    var renderer = new _marked2.default.Renderer();
+    renderer.link = function (href, title, text) {
+      return '<a href="' + href + '" target="_blank" title="' + title + '">' + text + '</a>';
+    };
+
+    _this.marked_options = {
+      renderer: renderer
     };
 
     _this.markdownEditorChange = _this.markdownEditorChange.bind(_this);
@@ -12059,7 +12071,8 @@ var App = function (_React$Component) {
     value: function render() {
       var _this2 = this;
 
-      var toolbar = [{ label: '-    list', handler: App.handleListClick }, { label: '#    h1', handler: App.handleH1Click }, { label: '|-|  table', handler: App.handleTableClick }, { label: '![]() image', handler: App.handleImageClick, is_file: true }];
+      var btn_class = 'btn btn-tight mx-4 mb-4';
+      var toolbar = [{ label: '-    list', handler: App.handleListClick, className: btn_class }, { label: '1.   numbered list', handler: App.handleNumberedListClick, className: btn_class }, { label: '#    h1', handler: App.handleH1Click, className: btn_class }, { label: '###  h3', handler: App.handleH3Click, className: btn_class }, { label: '---  hr', handler: App.handleHRClick, className: btn_class }, { label: '|-|  table', handler: App.handleTableClick, className: btn_class }, { label: '![]() image', handler: App.handleImageClick, is_file: true, className: btn_class }];
 
       return _react2.default.createElement(
         'div',
@@ -12074,6 +12087,21 @@ var App = function (_React$Component) {
           null,
           styles.base
         ),
+        this.state.view === 'tabs' ? _react2.default.createElement(
+          'style',
+          null,
+          styles.tabs
+        ) : null,
+        _react2.default.createElement(
+          'style',
+          null,
+          styles[this.state.markdown_style]
+        ),
+        this.state.height_radio === 'flex' ? _react2.default.createElement(
+          'style',
+          null,
+          styles.flex
+        ) : null,
         _react2.default.createElement(
           'div',
           { className: 'flex-column absolute-full' },
@@ -12084,11 +12112,24 @@ var App = function (_React$Component) {
               'h1',
               null,
               'React Markdown Editor'
+            ),
+            _react2.default.createElement(
+              'span',
+              null,
+              '<',
+              '\u2665',
+              '/>',
+              ' by ',
+              _react2.default.createElement(
+                'a',
+                { href: 'https://www.linkedin.com/in/stevenkaspar/', target: '_blank' },
+                'Steven Kaspar'
+              )
             )
           ),
           _react2.default.createElement(
             'div',
-            { className: 'flex-none flex-row justify-content-between py-10 px-4' },
+            { className: 'flex-none flex-row justify-content-between py-10 px-4 bg-gray-darkest mb-4' },
             _react2.default.createElement(
               'div',
               null,
@@ -12117,7 +12158,7 @@ var App = function (_React$Component) {
               ),
               _react2.default.createElement(
                 'div',
-                { className: 'radio-group' },
+                { className: 'radio-group mr-10' },
                 _react2.default.createElement(
                   'label',
                   null,
@@ -12136,6 +12177,29 @@ var App = function (_React$Component) {
                       return _this2.setState({ markdown_style: null });
                     } },
                   'None'
+                )
+              ),
+              _react2.default.createElement(
+                'div',
+                { className: 'radio-group' },
+                _react2.default.createElement(
+                  'label',
+                  null,
+                  'Height'
+                ),
+                _react2.default.createElement(
+                  'button',
+                  { className: 'btn radio-btn ' + (this.state.height_radio === 'flex' ? 'selected' : ''), onClick: function onClick() {
+                      return _this2.setState({ height_radio: 'flex' });
+                    } },
+                  'Flex Auto'
+                ),
+                _react2.default.createElement(
+                  'button',
+                  { className: 'btn radio-btn ' + (this.state.height_radio === 'fixed' ? 'selected' : ''), onClick: function onClick() {
+                      return _this2.setState({ height_radio: 'fixed' });
+                    } },
+                  'Fixed'
                 )
               )
             ),
@@ -12156,40 +12220,24 @@ var App = function (_React$Component) {
                   } },
                 'copy HTML output'
               )
-            ),
-            _react2.default.createElement(
-              'style',
-              null,
-              styles[this.state.markdown_style]
             )
           ),
           _react2.default.createElement(
             'div',
-            { className: 'flex-auto overflow-auto' },
-            this.state.view === 'basic' ? _react2.default.createElement(
-              'div',
-              null,
-              _react2.default.createElement(_MarkdownEditor2.default, {
-                height: 400,
-                toolbar: toolbar,
-                value: this.state.value,
-                onChange: this.markdownEditorChange })
-            ) : null,
-            this.state.view === 'tabs' ? _react2.default.createElement(
-              'div',
-              null,
-              _react2.default.createElement(
-                'style',
-                null,
-                styles.tabs
-              ),
-              _react2.default.createElement(_MarkdownEditor2.default, {
-                height: 400,
-                tabs: true,
-                toolbar: toolbar,
-                value: this.state.value,
-                onChange: this.markdownEditorChange })
-            ) : null
+            { className: 'flex-auto overflow-auto flex-column' },
+            this.state.view === 'basic' ? _react2.default.createElement(_MarkdownEditor2.default, {
+              height: 400,
+              marked_options: this.marked_options,
+              toolbar: toolbar,
+              value: this.state.value,
+              onChange: this.markdownEditorChange }) : null,
+            this.state.view === 'tabs' ? _react2.default.createElement(_MarkdownEditor2.default, {
+              height: 400,
+              marked_options: this.marked_options,
+              tabs: true,
+              toolbar: toolbar,
+              value: this.state.value,
+              onChange: this.markdownEditorChange }) : null
           )
         )
       );
@@ -12235,9 +12283,24 @@ var App = function (_React$Component) {
       cb({ wrap: { start: '# ', end: '' } });
     }
   }, {
+    key: 'handleH3Click',
+    value: function handleH3Click(data, cb) {
+      cb({ wrap: { start: '### ', end: '' } });
+    }
+  }, {
+    key: 'handleHRClick',
+    value: function handleHRClick(data, cb) {
+      cb({ wrap: { start: '', end: '---\n\n' } });
+    }
+  }, {
     key: 'handleListClick',
     value: function handleListClick(data, cb) {
       cb({ wrap: { start: '- ', end: '' } });
+    }
+  }, {
+    key: 'handleNumberedListClick',
+    value: function handleNumberedListClick(data, cb) {
+      cb({ wrap: { start: '1. ', end: '' } });
     }
   }, {
     key: 'handleTableClick',
@@ -13463,7 +13526,7 @@ module.exports = factory(Component, isValidElement, ReactNoopUpdateQueue);
 
 var _assign = __webpack_require__(4);
 
-var emptyObject = __webpack_require__(27);
+var emptyObject = __webpack_require__(28);
 var _invariant = __webpack_require__(1);
 
 if (process.env.NODE_ENV !== 'production') {
@@ -14682,7 +14745,7 @@ module.exports = ARIADOMPropertyConfig;
 
 
 
-var EventPropagators = __webpack_require__(21);
+var EventPropagators = __webpack_require__(22);
 var ExecutionEnvironment = __webpack_require__(6);
 var FallbackCompositionState = __webpack_require__(113);
 var SyntheticCompositionEvent = __webpack_require__(114);
@@ -15254,8 +15317,8 @@ module.exports = SyntheticInputEvent;
 
 
 
-var EventPluginHub = __webpack_require__(22);
-var EventPropagators = __webpack_require__(21);
+var EventPluginHub = __webpack_require__(23);
+var EventPropagators = __webpack_require__(22);
 var ExecutionEnvironment = __webpack_require__(6);
 var ReactDOMComponentTree = __webpack_require__(5);
 var ReactUpdates = __webpack_require__(11);
@@ -16311,9 +16374,9 @@ module.exports = DefaultEventPluginOrder;
 
 
 
-var EventPropagators = __webpack_require__(21);
+var EventPropagators = __webpack_require__(22);
 var ReactDOMComponentTree = __webpack_require__(5);
-var SyntheticMouseEvent = __webpack_require__(30);
+var SyntheticMouseEvent = __webpack_require__(31);
 
 var eventTypes = {
   mouseEnter: {
@@ -17113,9 +17176,9 @@ var DOMLazyTree = __webpack_require__(20);
 var DOMNamespaces = __webpack_require__(45);
 var DOMProperty = __webpack_require__(14);
 var DOMPropertyOperations = __webpack_require__(76);
-var EventPluginHub = __webpack_require__(22);
-var EventPluginRegistry = __webpack_require__(28);
-var ReactBrowserEventEmitter = __webpack_require__(33);
+var EventPluginHub = __webpack_require__(23);
+var EventPluginRegistry = __webpack_require__(29);
+var ReactBrowserEventEmitter = __webpack_require__(34);
 var ReactDOMComponentFlags = __webpack_require__(64);
 var ReactDOMComponentTree = __webpack_require__(5);
 var ReactDOMInput = __webpack_require__(145);
@@ -17127,7 +17190,7 @@ var ReactMultiChild = __webpack_require__(148);
 var ReactServerRenderingTransaction = __webpack_require__(157);
 
 var emptyFunction = __webpack_require__(8);
-var escapeTextContentForBrowser = __webpack_require__(32);
+var escapeTextContentForBrowser = __webpack_require__(33);
 var invariant = __webpack_require__(1);
 var isEventSupported = __webpack_require__(42);
 var shallowEqual = __webpack_require__(49);
@@ -18652,7 +18715,7 @@ module.exports = memoizeStringOnly;
 
 
 
-var escapeTextContentForBrowser = __webpack_require__(32);
+var escapeTextContentForBrowser = __webpack_require__(33);
 
 /**
  * Escapes attribute value to prevent scripting attacks.
@@ -18683,7 +18746,7 @@ module.exports = quoteAttributeValueForBrowser;
 
 
 
-var EventPluginHub = __webpack_require__(22);
+var EventPluginHub = __webpack_require__(23);
 
 function runEventQueueInBatch(events) {
   EventPluginHub.enqueueEvents(events);
@@ -19416,7 +19479,7 @@ module.exports = ReactDOMTextarea;
 var _prodInvariant = __webpack_require__(3);
 
 var ReactComponentEnvironment = __webpack_require__(48);
-var ReactInstanceMap = __webpack_require__(24);
+var ReactInstanceMap = __webpack_require__(25);
 var ReactInstrumentation = __webpack_require__(9);
 
 var ReactCurrentOwner = __webpack_require__(10);
@@ -20031,7 +20094,7 @@ var React = __webpack_require__(17);
 var ReactComponentEnvironment = __webpack_require__(48);
 var ReactCurrentOwner = __webpack_require__(10);
 var ReactErrorUtils = __webpack_require__(40);
-var ReactInstanceMap = __webpack_require__(24);
+var ReactInstanceMap = __webpack_require__(25);
 var ReactInstrumentation = __webpack_require__(9);
 var ReactNodeTypes = __webpack_require__(80);
 var ReactReconciler = __webpack_require__(19);
@@ -20040,7 +20103,7 @@ if (process.env.NODE_ENV !== 'production') {
   var checkReactTypeSpec = __webpack_require__(151);
 }
 
-var emptyObject = __webpack_require__(27);
+var emptyObject = __webpack_require__(28);
 var invariant = __webpack_require__(1);
 var shallowEqual = __webpack_require__(49);
 var shouldUpdateReactComponent = __webpack_require__(50);
@@ -21236,7 +21299,7 @@ module.exports = flattenChildren;
 var _assign = __webpack_require__(4);
 
 var PooledClass = __webpack_require__(16);
-var Transaction = __webpack_require__(29);
+var Transaction = __webpack_require__(30);
 var ReactInstrumentation = __webpack_require__(9);
 var ReactServerUpdateQueue = __webpack_require__(158);
 
@@ -21688,7 +21751,7 @@ var DOMChildrenOperations = __webpack_require__(44);
 var DOMLazyTree = __webpack_require__(20);
 var ReactDOMComponentTree = __webpack_require__(5);
 
-var escapeTextContentForBrowser = __webpack_require__(32);
+var escapeTextContentForBrowser = __webpack_require__(33);
 var invariant = __webpack_require__(1);
 var validateDOMNesting = __webpack_require__(53);
 
@@ -21852,7 +21915,7 @@ module.exports = ReactDOMTextComponent;
 var _assign = __webpack_require__(4);
 
 var ReactUpdates = __webpack_require__(11);
-var Transaction = __webpack_require__(29);
+var Transaction = __webpack_require__(30);
 
 var emptyFunction = __webpack_require__(8);
 
@@ -22127,11 +22190,11 @@ module.exports = getUnboundedScrollPosition;
 
 
 var DOMProperty = __webpack_require__(14);
-var EventPluginHub = __webpack_require__(22);
+var EventPluginHub = __webpack_require__(23);
 var EventPluginUtils = __webpack_require__(39);
 var ReactComponentEnvironment = __webpack_require__(48);
 var ReactEmptyComponent = __webpack_require__(81);
-var ReactBrowserEventEmitter = __webpack_require__(33);
+var ReactBrowserEventEmitter = __webpack_require__(34);
 var ReactHostComponent = __webpack_require__(82);
 var ReactUpdates = __webpack_require__(11);
 
@@ -22169,10 +22232,10 @@ var _assign = __webpack_require__(4);
 
 var CallbackQueue = __webpack_require__(68);
 var PooledClass = __webpack_require__(16);
-var ReactBrowserEventEmitter = __webpack_require__(33);
+var ReactBrowserEventEmitter = __webpack_require__(34);
 var ReactInputSelection = __webpack_require__(85);
 var ReactInstrumentation = __webpack_require__(9);
-var Transaction = __webpack_require__(29);
+var Transaction = __webpack_require__(30);
 var ReactUpdateQueue = __webpack_require__(52);
 
 /**
@@ -23057,7 +23120,7 @@ module.exports = SVGDOMPropertyConfig;
 
 
 
-var EventPropagators = __webpack_require__(21);
+var EventPropagators = __webpack_require__(22);
 var ExecutionEnvironment = __webpack_require__(6);
 var ReactDOMComponentTree = __webpack_require__(5);
 var ReactInputSelection = __webpack_require__(85);
@@ -23254,18 +23317,18 @@ module.exports = SelectEventPlugin;
 var _prodInvariant = __webpack_require__(3);
 
 var EventListener = __webpack_require__(84);
-var EventPropagators = __webpack_require__(21);
+var EventPropagators = __webpack_require__(22);
 var ReactDOMComponentTree = __webpack_require__(5);
 var SyntheticAnimationEvent = __webpack_require__(175);
 var SyntheticClipboardEvent = __webpack_require__(176);
 var SyntheticEvent = __webpack_require__(12);
 var SyntheticFocusEvent = __webpack_require__(177);
 var SyntheticKeyboardEvent = __webpack_require__(178);
-var SyntheticMouseEvent = __webpack_require__(30);
+var SyntheticMouseEvent = __webpack_require__(31);
 var SyntheticDragEvent = __webpack_require__(180);
 var SyntheticTouchEvent = __webpack_require__(181);
 var SyntheticTransitionEvent = __webpack_require__(182);
-var SyntheticUIEvent = __webpack_require__(23);
+var SyntheticUIEvent = __webpack_require__(24);
 var SyntheticWheelEvent = __webpack_require__(183);
 
 var emptyFunction = __webpack_require__(8);
@@ -23569,7 +23632,7 @@ module.exports = SyntheticClipboardEvent;
 
 
 
-var SyntheticUIEvent = __webpack_require__(23);
+var SyntheticUIEvent = __webpack_require__(24);
 
 /**
  * @interface FocusEvent
@@ -23610,7 +23673,7 @@ module.exports = SyntheticFocusEvent;
 
 
 
-var SyntheticUIEvent = __webpack_require__(23);
+var SyntheticUIEvent = __webpack_require__(24);
 
 var getEventCharCode = __webpack_require__(54);
 var getEventKey = __webpack_require__(179);
@@ -23816,7 +23879,7 @@ module.exports = getEventKey;
 
 
 
-var SyntheticMouseEvent = __webpack_require__(30);
+var SyntheticMouseEvent = __webpack_require__(31);
 
 /**
  * @interface DragEvent
@@ -23857,7 +23920,7 @@ module.exports = SyntheticDragEvent;
 
 
 
-var SyntheticUIEvent = __webpack_require__(23);
+var SyntheticUIEvent = __webpack_require__(24);
 
 var getEventModifierState = __webpack_require__(43);
 
@@ -23951,7 +24014,7 @@ module.exports = SyntheticTransitionEvent;
 
 
 
-var SyntheticMouseEvent = __webpack_require__(30);
+var SyntheticMouseEvent = __webpack_require__(31);
 
 /**
  * @interface WheelEvent
@@ -24197,7 +24260,7 @@ var _prodInvariant = __webpack_require__(3);
 
 var ReactCurrentOwner = __webpack_require__(10);
 var ReactDOMComponentTree = __webpack_require__(5);
-var ReactInstanceMap = __webpack_require__(24);
+var ReactInstanceMap = __webpack_require__(25);
 
 var getHostComponentFromComposite = __webpack_require__(88);
 var invariant = __webpack_require__(1);
@@ -24281,7 +24344,7 @@ module.exports = ReactMount.renderSubtreeIntoContainer;
 
 
 var DOMProperty = __webpack_require__(14);
-var EventPluginRegistry = __webpack_require__(28);
+var EventPluginRegistry = __webpack_require__(29);
 var ReactComponentTreeHook = __webpack_require__(7);
 
 var warning = __webpack_require__(2);
@@ -24548,11 +24611,15 @@ var _react = __webpack_require__(13);
 
 var _react2 = _interopRequireDefault(_react);
 
+var _propTypes = __webpack_require__(21);
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
 var _marked = __webpack_require__(89);
 
 var _marked2 = _interopRequireDefault(_marked);
 
-var _reactTabs = __webpack_require__(195);
+var _reactTabs = __webpack_require__(196);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -24562,24 +24629,15 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-// configure markdown
-(function () {
-  var renderer = new _marked2.default.Renderer();
-  renderer.link = function (href, title, text) {
-    return '<a href="' + href + '" target="_blank" title="' + title + '">' + text + '</a>';
-  };
-  _marked2.default.setOptions({
-    renderer: renderer
-  });
-})();
-
 var MarkdownEditor = function (_React$Component) {
   _inherits(MarkdownEditor, _React$Component);
 
   function MarkdownEditor(_ref) {
     var value = _ref.value,
         _ref$height = _ref.height,
-        height = _ref$height === undefined ? 200 : _ref$height;
+        height = _ref$height === undefined ? '' : _ref$height,
+        _ref$marked_options = _ref.marked_options,
+        marked_options = _ref$marked_options === undefined ? {} : _ref$marked_options;
 
     _classCallCheck(this, MarkdownEditor);
 
@@ -24590,6 +24648,8 @@ var MarkdownEditor = function (_React$Component) {
       height: height,
       file_inputs: []
     };
+
+    _this.setMarkedOptions(marked_options);
 
     _this.markdownChange = _this.markdownChange.bind(_this);
     _this.toolbarButtonMouseDown = _this.toolbarButtonMouseDown.bind(_this);
@@ -24602,6 +24662,11 @@ var MarkdownEditor = function (_React$Component) {
   }
 
   _createClass(MarkdownEditor, [{
+    key: 'setMarkedOptions',
+    value: function setMarkedOptions(options) {
+      _marked2.default.setOptions(options);
+    }
+  }, {
     key: 'componentWillReceiveProps',
     value: function componentWillReceiveProps(new_props) {
       this.setState({
@@ -24720,9 +24785,6 @@ var MarkdownEditor = function (_React$Component) {
       }
       handler(this.tool_callback_data, this.toolHandleCallback.bind(this));
     }
-  }, {
-    key: 'toolHandleCallback',
-
 
     /**
      * Callback function that will be called by the toolbar.handler functions
@@ -24734,6 +24796,9 @@ var MarkdownEditor = function (_React$Component) {
      * @param  {[String]} new_value [description]
      * @param  {[Object]} wrap      {start: 'xx', end: '\n\n'}
      */
+
+  }, {
+    key: 'toolHandleCallback',
     value: function toolHandleCallback(_ref3) {
       var _this3 = this;
 
@@ -24785,6 +24850,7 @@ var MarkdownEditor = function (_React$Component) {
             jsx.push(_react2.default.createElement(
               'button',
               {
+                className: tool.className,
                 key: index++,
                 onMouseDown: _this4.toolbarButtonMouseDown,
                 onMouseUp: function onMouseUp(event) {
@@ -24795,6 +24861,7 @@ var MarkdownEditor = function (_React$Component) {
             ));
           } else if (tool.html) {
             jsx.push(_react2.default.createElement('span', {
+              className: tool.className,
               key: index++,
               onMouseDown: _this4.toolbarButtonMouseDown,
               onMouseUp: function onMouseUp(event) {
@@ -24835,12 +24902,12 @@ var MarkdownEditor = function (_React$Component) {
 
       return _react2.default.createElement('textarea', { ref: function ref(textarea) {
           _this5.textarea = textarea;
-        }, className: 'react-dom-markdown-editor-textarea', onMouseDown: this.handleTextareaMouseDown, style: { height: this.state.height + 'px' }, value: this.state.value, onChange: this.markdownChange });
+        }, className: 'react-dom-markdown-editor-textarea', onMouseDown: this.handleTextareaMouseDown, style: { height: this.style_height }, value: this.state.value, onChange: this.markdownChange });
     }
   }, {
     key: 'getPreviewJSX',
     value: function getPreviewJSX() {
-      return _react2.default.createElement('div', { className: 'react-dom-markdown-editor-preview', style: { height: this.state.height + 'px' },
+      return _react2.default.createElement('div', { className: 'react-dom-markdown-editor-preview', style: { height: this.style_height },
         dangerouslySetInnerHTML: this.compileMarkdownToHTML(this.state.value) });
     }
   }, {
@@ -24901,12 +24968,12 @@ var MarkdownEditor = function (_React$Component) {
             _react2.default.createElement(
               _reactTabs.Tab,
               null,
-              'Markdown'
+              this.props.markdown_tab_label ? this.props.markdown_tab_label : 'Markdown'
             ),
             _react2.default.createElement(
               _reactTabs.Tab,
               null,
-              'Preview'
+              this.props.preview_tab_label ? this.props.preview_tab_label : 'Preview'
             )
           ),
           _react2.default.createElement(
@@ -24937,6 +25004,18 @@ var MarkdownEditor = function (_React$Component) {
         }),
         target: this.textarea
       };
+    }
+  }, {
+    key: 'style_height',
+    get: function get() {
+      if (typeof this.state.height === 'undefined') {
+        return 'auto';
+      } else if (typeof this.state.height === 'number') {
+        return this.state.height + 'px';
+      } else if (typeof this.state.height === 'string') {
+        return this.state.height;
+      }
+      return 'auto';
     }
   }], [{
     key: 'getInputSelection',
@@ -24999,8 +25078,20 @@ var MarkdownEditor = function (_React$Component) {
 ;
 
 MarkdownEditor.propTypes = {
-  height: _react.PropTypes.number,
-  value: _react.PropTypes.string
+  height: _propTypes2.default.oneOfType([_propTypes2.default.string, _propTypes2.default.number]),
+  value: _propTypes2.default.string,
+  marked_options: _propTypes2.default.object,
+  toolbar: _propTypes2.default.arrayOf(_propTypes2.default.shape({
+    className: _propTypes2.default.string,
+    html: _propTypes2.default.string,
+    label: _propTypes2.default.string,
+    handler: _propTypes2.default.func.isRequired,
+    is_file: _propTypes2.default.bool
+  })),
+  tabs: _propTypes2.default.bool,
+  onChange: _propTypes2.default.func,
+  markdown_tab_label: _propTypes2.default.string,
+  preview_tab_label: _propTypes2.default.string
 };
 
 exports.default = MarkdownEditor;
@@ -25010,12 +25101,78 @@ exports.default = MarkdownEditor;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+/**
+ * Copyright 2013-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ */
+
+
+
+var emptyFunction = __webpack_require__(8);
+var invariant = __webpack_require__(1);
+var ReactPropTypesSecret = __webpack_require__(38);
+
+module.exports = function() {
+  function shim(props, propName, componentName, location, propFullName, secret) {
+    if (secret === ReactPropTypesSecret) {
+      // It is still safe when called from React.
+      return;
+    }
+    invariant(
+      false,
+      'Calling PropTypes validators directly is not supported by the `prop-types` package. ' +
+      'Use PropTypes.checkPropTypes() to call them. ' +
+      'Read more at http://fb.me/use-check-prop-types'
+    );
+  };
+  shim.isRequired = shim;
+  function getShim() {
+    return shim;
+  };
+  // Important!
+  // Keep this list in sync with production version in `./factoryWithTypeCheckers.js`.
+  var ReactPropTypes = {
+    array: shim,
+    bool: shim,
+    func: shim,
+    number: shim,
+    object: shim,
+    string: shim,
+    symbol: shim,
+
+    any: shim,
+    arrayOf: getShim,
+    element: shim,
+    instanceOf: getShim,
+    node: shim,
+    objectOf: getShim,
+    oneOf: getShim,
+    oneOfType: getShim,
+    shape: getShim
+  };
+
+  ReactPropTypes.checkPropTypes = emptyFunction;
+  ReactPropTypes.PropTypes = ReactPropTypes;
+
+  return ReactPropTypes;
+};
+
+
+/***/ }),
+/* 196 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
 
 
 exports.__esModule = true;
 exports.resetIdCounter = exports.Tabs = exports.TabPanel = exports.TabList = exports.Tab = undefined;
 
-var _Tabs = __webpack_require__(196);
+var _Tabs = __webpack_require__(197);
 
 var _Tabs2 = _interopRequireDefault(_Tabs);
 
@@ -25042,7 +25199,7 @@ exports.Tabs = _Tabs2.default;
 exports.resetIdCounter = _uuid.reset;
 
 /***/ }),
-/* 196 */
+/* 197 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25050,7 +25207,7 @@ exports.resetIdCounter = _uuid.reset;
 
 exports.__esModule = true;
 
-var _propTypes = __webpack_require__(25);
+var _propTypes = __webpack_require__(21);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
@@ -25197,72 +25354,6 @@ Tabs.tabsRole = 'Tabs';
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 197 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2013-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
- */
-
-
-
-var emptyFunction = __webpack_require__(8);
-var invariant = __webpack_require__(1);
-var ReactPropTypesSecret = __webpack_require__(38);
-
-module.exports = function() {
-  function shim(props, propName, componentName, location, propFullName, secret) {
-    if (secret === ReactPropTypesSecret) {
-      // It is still safe when called from React.
-      return;
-    }
-    invariant(
-      false,
-      'Calling PropTypes validators directly is not supported by the `prop-types` package. ' +
-      'Use PropTypes.checkPropTypes() to call them. ' +
-      'Read more at http://fb.me/use-check-prop-types'
-    );
-  };
-  shim.isRequired = shim;
-  function getShim() {
-    return shim;
-  };
-  // Important!
-  // Keep this list in sync with production version in `./factoryWithTypeCheckers.js`.
-  var ReactPropTypes = {
-    array: shim,
-    bool: shim,
-    func: shim,
-    number: shim,
-    object: shim,
-    string: shim,
-    symbol: shim,
-
-    any: shim,
-    arrayOf: getShim,
-    element: shim,
-    instanceOf: getShim,
-    node: shim,
-    objectOf: getShim,
-    oneOf: getShim,
-    oneOfType: getShim,
-    shape: getShim
-  };
-
-  ReactPropTypes.checkPropTypes = emptyFunction;
-  ReactPropTypes.PropTypes = ReactPropTypes;
-
-  return ReactPropTypes;
-};
-
-
-/***/ }),
 /* 198 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -25273,7 +25364,7 @@ exports.__esModule = true;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _propTypes = __webpack_require__(25);
+var _propTypes = __webpack_require__(21);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
@@ -25281,7 +25372,7 @@ var _react = __webpack_require__(13);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _classnames = __webpack_require__(35);
+var _classnames = __webpack_require__(36);
 
 var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -25295,7 +25386,7 @@ var _count = __webpack_require__(92);
 
 var _childrenDeepMap = __webpack_require__(56);
 
-var _elementTypes = __webpack_require__(34);
+var _elementTypes = __webpack_require__(35);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -25613,7 +25704,7 @@ exports.__esModule = true;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _propTypes = __webpack_require__(25);
+var _propTypes = __webpack_require__(21);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
@@ -25621,7 +25712,7 @@ var _react = __webpack_require__(13);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _classnames = __webpack_require__(35);
+var _classnames = __webpack_require__(36);
 
 var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -25684,7 +25775,7 @@ exports.__esModule = true;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _propTypes = __webpack_require__(25);
+var _propTypes = __webpack_require__(21);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
@@ -25692,7 +25783,7 @@ var _react = __webpack_require__(13);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _classnames = __webpack_require__(35);
+var _classnames = __webpack_require__(36);
 
 var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -25808,7 +25899,7 @@ exports.__esModule = true;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _propTypes = __webpack_require__(25);
+var _propTypes = __webpack_require__(21);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
@@ -25816,7 +25907,7 @@ var _react = __webpack_require__(13);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _classnames = __webpack_require__(35);
+var _classnames = __webpack_require__(36);
 
 var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -29643,12 +29734,12 @@ module.exports = XHR;
 /* 206 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(36)(undefined);
+exports = module.exports = __webpack_require__(26)(undefined);
 // imports
 
 
 // module
-exports.push([module.i, "html {\n  font-family: Arial, sans-serif;\n  font-size: 14px; }\n\n* {\n  padding: 0;\n  margin: 0; }\n\nheader {\n  background: #e2e5ea;\n  color: #b2b8c3; }\n\n.btn {\n  outline: none;\n  border: none;\n  background: none;\n  font-size: inherit;\n  font-family: inherit;\n  padding: 10px;\n  background: #e2e5ea;\n  color: #5287de; }\n  .btn:hover {\n    background: #ebedf0;\n    color: #5287de; }\n\n.radio-group {\n  display: inline-block; }\n  .radio-group > * {\n    padding: 10px; }\n  .radio-group label {\n    background: #f0f2f5;\n    color: #878e98; }\n  .radio-group .radio-btn.selected {\n    background: #d3d8df;\n    box-shadow: 0 0 4px #bec3cc inset;\n    color: #3d78da; }\n\n/** util clases **/\n.flex-row {\n  display: flex;\n  flex-direction: row; }\n\n.flex-column {\n  display: flex;\n  flex-direction: column; }\n\n.flex-none {\n  flex: none; }\n\n.flex-auto {\n  flex: auto; }\n\n.flex-initial {\n  flex: initial; }\n\n.justify-content-around {\n  justify-content: space-around; }\n\n.justify-content-between {\n  justify-content: space-between; }\n\n.overflow-auto {\n  overflow: auto; }\n\n.overflow-y-auto {\n  overflow-y: auto; }\n\n.overflow-x-auto {\n  overflow-y: auto; }\n\n.overflow-hidden {\n  overflow: hidden; }\n\n.overflow-y-hidden {\n  overflow-y: hidden; }\n\n.overflow-x-hidden {\n  overflow-y: hidden; }\n\n.text-left {\n  text-align: left; }\n\n.text-center {\n  text-align: center; }\n\n.text-right {\n  text-align: right; }\n\n.p-0 {\n  padding: 0px; }\n\n.pt-0 {\n  padding-top: 0px; }\n\n.pr-0 {\n  padding-right: 0px; }\n\n.pb-0 {\n  padding-bottom: 0px; }\n\n.pl-0 {\n  padding-left: 0px; }\n\n.py-0 {\n  padding-top: 0px;\n  padding-bottom: 0px; }\n\n.px-0 {\n  padding-right: 0px;\n  padding-left: 0px; }\n\n.p-1 {\n  padding: 1px; }\n\n.pt-1 {\n  padding-top: 1px; }\n\n.pr-1 {\n  padding-right: 1px; }\n\n.pb-1 {\n  padding-bottom: 1px; }\n\n.pl-1 {\n  padding-left: 1px; }\n\n.py-1 {\n  padding-top: 1px;\n  padding-bottom: 1px; }\n\n.px-1 {\n  padding-right: 1px;\n  padding-left: 1px; }\n\n.p-2 {\n  padding: 2px; }\n\n.pt-2 {\n  padding-top: 2px; }\n\n.pr-2 {\n  padding-right: 2px; }\n\n.pb-2 {\n  padding-bottom: 2px; }\n\n.pl-2 {\n  padding-left: 2px; }\n\n.py-2 {\n  padding-top: 2px;\n  padding-bottom: 2px; }\n\n.px-2 {\n  padding-right: 2px;\n  padding-left: 2px; }\n\n.p-3 {\n  padding: 3px; }\n\n.pt-3 {\n  padding-top: 3px; }\n\n.pr-3 {\n  padding-right: 3px; }\n\n.pb-3 {\n  padding-bottom: 3px; }\n\n.pl-3 {\n  padding-left: 3px; }\n\n.py-3 {\n  padding-top: 3px;\n  padding-bottom: 3px; }\n\n.px-3 {\n  padding-right: 3px;\n  padding-left: 3px; }\n\n.p-4 {\n  padding: 4px; }\n\n.pt-4 {\n  padding-top: 4px; }\n\n.pr-4 {\n  padding-right: 4px; }\n\n.pb-4 {\n  padding-bottom: 4px; }\n\n.pl-4 {\n  padding-left: 4px; }\n\n.py-4 {\n  padding-top: 4px;\n  padding-bottom: 4px; }\n\n.px-4 {\n  padding-right: 4px;\n  padding-left: 4px; }\n\n.p-5 {\n  padding: 5px; }\n\n.pt-5 {\n  padding-top: 5px; }\n\n.pr-5 {\n  padding-right: 5px; }\n\n.pb-5 {\n  padding-bottom: 5px; }\n\n.pl-5 {\n  padding-left: 5px; }\n\n.py-5 {\n  padding-top: 5px;\n  padding-bottom: 5px; }\n\n.px-5 {\n  padding-right: 5px;\n  padding-left: 5px; }\n\n.p-6 {\n  padding: 6px; }\n\n.pt-6 {\n  padding-top: 6px; }\n\n.pr-6 {\n  padding-right: 6px; }\n\n.pb-6 {\n  padding-bottom: 6px; }\n\n.pl-6 {\n  padding-left: 6px; }\n\n.py-6 {\n  padding-top: 6px;\n  padding-bottom: 6px; }\n\n.px-6 {\n  padding-right: 6px;\n  padding-left: 6px; }\n\n.p-7 {\n  padding: 7px; }\n\n.pt-7 {\n  padding-top: 7px; }\n\n.pr-7 {\n  padding-right: 7px; }\n\n.pb-7 {\n  padding-bottom: 7px; }\n\n.pl-7 {\n  padding-left: 7px; }\n\n.py-7 {\n  padding-top: 7px;\n  padding-bottom: 7px; }\n\n.px-7 {\n  padding-right: 7px;\n  padding-left: 7px; }\n\n.p-8 {\n  padding: 8px; }\n\n.pt-8 {\n  padding-top: 8px; }\n\n.pr-8 {\n  padding-right: 8px; }\n\n.pb-8 {\n  padding-bottom: 8px; }\n\n.pl-8 {\n  padding-left: 8px; }\n\n.py-8 {\n  padding-top: 8px;\n  padding-bottom: 8px; }\n\n.px-8 {\n  padding-right: 8px;\n  padding-left: 8px; }\n\n.p-9 {\n  padding: 9px; }\n\n.pt-9 {\n  padding-top: 9px; }\n\n.pr-9 {\n  padding-right: 9px; }\n\n.pb-9 {\n  padding-bottom: 9px; }\n\n.pl-9 {\n  padding-left: 9px; }\n\n.py-9 {\n  padding-top: 9px;\n  padding-bottom: 9px; }\n\n.px-9 {\n  padding-right: 9px;\n  padding-left: 9px; }\n\n.p-10 {\n  padding: 10px; }\n\n.pt-10 {\n  padding-top: 10px; }\n\n.pr-10 {\n  padding-right: 10px; }\n\n.pb-10 {\n  padding-bottom: 10px; }\n\n.pl-10 {\n  padding-left: 10px; }\n\n.py-10 {\n  padding-top: 10px;\n  padding-bottom: 10px; }\n\n.px-10 {\n  padding-right: 10px;\n  padding-left: 10px; }\n\n.p-11 {\n  padding: 11px; }\n\n.pt-11 {\n  padding-top: 11px; }\n\n.pr-11 {\n  padding-right: 11px; }\n\n.pb-11 {\n  padding-bottom: 11px; }\n\n.pl-11 {\n  padding-left: 11px; }\n\n.py-11 {\n  padding-top: 11px;\n  padding-bottom: 11px; }\n\n.px-11 {\n  padding-right: 11px;\n  padding-left: 11px; }\n\n.p-12 {\n  padding: 12px; }\n\n.pt-12 {\n  padding-top: 12px; }\n\n.pr-12 {\n  padding-right: 12px; }\n\n.pb-12 {\n  padding-bottom: 12px; }\n\n.pl-12 {\n  padding-left: 12px; }\n\n.py-12 {\n  padding-top: 12px;\n  padding-bottom: 12px; }\n\n.px-12 {\n  padding-right: 12px;\n  padding-left: 12px; }\n\n.p-13 {\n  padding: 13px; }\n\n.pt-13 {\n  padding-top: 13px; }\n\n.pr-13 {\n  padding-right: 13px; }\n\n.pb-13 {\n  padding-bottom: 13px; }\n\n.pl-13 {\n  padding-left: 13px; }\n\n.py-13 {\n  padding-top: 13px;\n  padding-bottom: 13px; }\n\n.px-13 {\n  padding-right: 13px;\n  padding-left: 13px; }\n\n.p-14 {\n  padding: 14px; }\n\n.pt-14 {\n  padding-top: 14px; }\n\n.pr-14 {\n  padding-right: 14px; }\n\n.pb-14 {\n  padding-bottom: 14px; }\n\n.pl-14 {\n  padding-left: 14px; }\n\n.py-14 {\n  padding-top: 14px;\n  padding-bottom: 14px; }\n\n.px-14 {\n  padding-right: 14px;\n  padding-left: 14px; }\n\n.p-15 {\n  padding: 15px; }\n\n.pt-15 {\n  padding-top: 15px; }\n\n.pr-15 {\n  padding-right: 15px; }\n\n.pb-15 {\n  padding-bottom: 15px; }\n\n.pl-15 {\n  padding-left: 15px; }\n\n.py-15 {\n  padding-top: 15px;\n  padding-bottom: 15px; }\n\n.px-15 {\n  padding-right: 15px;\n  padding-left: 15px; }\n\n.p-16 {\n  padding: 16px; }\n\n.pt-16 {\n  padding-top: 16px; }\n\n.pr-16 {\n  padding-right: 16px; }\n\n.pb-16 {\n  padding-bottom: 16px; }\n\n.pl-16 {\n  padding-left: 16px; }\n\n.py-16 {\n  padding-top: 16px;\n  padding-bottom: 16px; }\n\n.px-16 {\n  padding-right: 16px;\n  padding-left: 16px; }\n\n.p-17 {\n  padding: 17px; }\n\n.pt-17 {\n  padding-top: 17px; }\n\n.pr-17 {\n  padding-right: 17px; }\n\n.pb-17 {\n  padding-bottom: 17px; }\n\n.pl-17 {\n  padding-left: 17px; }\n\n.py-17 {\n  padding-top: 17px;\n  padding-bottom: 17px; }\n\n.px-17 {\n  padding-right: 17px;\n  padding-left: 17px; }\n\n.p-18 {\n  padding: 18px; }\n\n.pt-18 {\n  padding-top: 18px; }\n\n.pr-18 {\n  padding-right: 18px; }\n\n.pb-18 {\n  padding-bottom: 18px; }\n\n.pl-18 {\n  padding-left: 18px; }\n\n.py-18 {\n  padding-top: 18px;\n  padding-bottom: 18px; }\n\n.px-18 {\n  padding-right: 18px;\n  padding-left: 18px; }\n\n.p-19 {\n  padding: 19px; }\n\n.pt-19 {\n  padding-top: 19px; }\n\n.pr-19 {\n  padding-right: 19px; }\n\n.pb-19 {\n  padding-bottom: 19px; }\n\n.pl-19 {\n  padding-left: 19px; }\n\n.py-19 {\n  padding-top: 19px;\n  padding-bottom: 19px; }\n\n.px-19 {\n  padding-right: 19px;\n  padding-left: 19px; }\n\n.p-20 {\n  padding: 20px; }\n\n.pt-20 {\n  padding-top: 20px; }\n\n.pr-20 {\n  padding-right: 20px; }\n\n.pb-20 {\n  padding-bottom: 20px; }\n\n.pl-20 {\n  padding-left: 20px; }\n\n.py-20 {\n  padding-top: 20px;\n  padding-bottom: 20px; }\n\n.px-20 {\n  padding-right: 20px;\n  padding-left: 20px; }\n\n.p-21 {\n  padding: 21px; }\n\n.pt-21 {\n  padding-top: 21px; }\n\n.pr-21 {\n  padding-right: 21px; }\n\n.pb-21 {\n  padding-bottom: 21px; }\n\n.pl-21 {\n  padding-left: 21px; }\n\n.py-21 {\n  padding-top: 21px;\n  padding-bottom: 21px; }\n\n.px-21 {\n  padding-right: 21px;\n  padding-left: 21px; }\n\n.p-22 {\n  padding: 22px; }\n\n.pt-22 {\n  padding-top: 22px; }\n\n.pr-22 {\n  padding-right: 22px; }\n\n.pb-22 {\n  padding-bottom: 22px; }\n\n.pl-22 {\n  padding-left: 22px; }\n\n.py-22 {\n  padding-top: 22px;\n  padding-bottom: 22px; }\n\n.px-22 {\n  padding-right: 22px;\n  padding-left: 22px; }\n\n.p-23 {\n  padding: 23px; }\n\n.pt-23 {\n  padding-top: 23px; }\n\n.pr-23 {\n  padding-right: 23px; }\n\n.pb-23 {\n  padding-bottom: 23px; }\n\n.pl-23 {\n  padding-left: 23px; }\n\n.py-23 {\n  padding-top: 23px;\n  padding-bottom: 23px; }\n\n.px-23 {\n  padding-right: 23px;\n  padding-left: 23px; }\n\n.p-24 {\n  padding: 24px; }\n\n.pt-24 {\n  padding-top: 24px; }\n\n.pr-24 {\n  padding-right: 24px; }\n\n.pb-24 {\n  padding-bottom: 24px; }\n\n.pl-24 {\n  padding-left: 24px; }\n\n.py-24 {\n  padding-top: 24px;\n  padding-bottom: 24px; }\n\n.px-24 {\n  padding-right: 24px;\n  padding-left: 24px; }\n\n.p-25 {\n  padding: 25px; }\n\n.pt-25 {\n  padding-top: 25px; }\n\n.pr-25 {\n  padding-right: 25px; }\n\n.pb-25 {\n  padding-bottom: 25px; }\n\n.pl-25 {\n  padding-left: 25px; }\n\n.py-25 {\n  padding-top: 25px;\n  padding-bottom: 25px; }\n\n.px-25 {\n  padding-right: 25px;\n  padding-left: 25px; }\n\n.p-26 {\n  padding: 26px; }\n\n.pt-26 {\n  padding-top: 26px; }\n\n.pr-26 {\n  padding-right: 26px; }\n\n.pb-26 {\n  padding-bottom: 26px; }\n\n.pl-26 {\n  padding-left: 26px; }\n\n.py-26 {\n  padding-top: 26px;\n  padding-bottom: 26px; }\n\n.px-26 {\n  padding-right: 26px;\n  padding-left: 26px; }\n\n.p-27 {\n  padding: 27px; }\n\n.pt-27 {\n  padding-top: 27px; }\n\n.pr-27 {\n  padding-right: 27px; }\n\n.pb-27 {\n  padding-bottom: 27px; }\n\n.pl-27 {\n  padding-left: 27px; }\n\n.py-27 {\n  padding-top: 27px;\n  padding-bottom: 27px; }\n\n.px-27 {\n  padding-right: 27px;\n  padding-left: 27px; }\n\n.p-28 {\n  padding: 28px; }\n\n.pt-28 {\n  padding-top: 28px; }\n\n.pr-28 {\n  padding-right: 28px; }\n\n.pb-28 {\n  padding-bottom: 28px; }\n\n.pl-28 {\n  padding-left: 28px; }\n\n.py-28 {\n  padding-top: 28px;\n  padding-bottom: 28px; }\n\n.px-28 {\n  padding-right: 28px;\n  padding-left: 28px; }\n\n.p-29 {\n  padding: 29px; }\n\n.pt-29 {\n  padding-top: 29px; }\n\n.pr-29 {\n  padding-right: 29px; }\n\n.pb-29 {\n  padding-bottom: 29px; }\n\n.pl-29 {\n  padding-left: 29px; }\n\n.py-29 {\n  padding-top: 29px;\n  padding-bottom: 29px; }\n\n.px-29 {\n  padding-right: 29px;\n  padding-left: 29px; }\n\n.p-30 {\n  padding: 30px; }\n\n.pt-30 {\n  padding-top: 30px; }\n\n.pr-30 {\n  padding-right: 30px; }\n\n.pb-30 {\n  padding-bottom: 30px; }\n\n.pl-30 {\n  padding-left: 30px; }\n\n.py-30 {\n  padding-top: 30px;\n  padding-bottom: 30px; }\n\n.px-30 {\n  padding-right: 30px;\n  padding-left: 30px; }\n\n.p-31 {\n  padding: 31px; }\n\n.pt-31 {\n  padding-top: 31px; }\n\n.pr-31 {\n  padding-right: 31px; }\n\n.pb-31 {\n  padding-bottom: 31px; }\n\n.pl-31 {\n  padding-left: 31px; }\n\n.py-31 {\n  padding-top: 31px;\n  padding-bottom: 31px; }\n\n.px-31 {\n  padding-right: 31px;\n  padding-left: 31px; }\n\n.p-32 {\n  padding: 32px; }\n\n.pt-32 {\n  padding-top: 32px; }\n\n.pr-32 {\n  padding-right: 32px; }\n\n.pb-32 {\n  padding-bottom: 32px; }\n\n.pl-32 {\n  padding-left: 32px; }\n\n.py-32 {\n  padding-top: 32px;\n  padding-bottom: 32px; }\n\n.px-32 {\n  padding-right: 32px;\n  padding-left: 32px; }\n\n.p-33 {\n  padding: 33px; }\n\n.pt-33 {\n  padding-top: 33px; }\n\n.pr-33 {\n  padding-right: 33px; }\n\n.pb-33 {\n  padding-bottom: 33px; }\n\n.pl-33 {\n  padding-left: 33px; }\n\n.py-33 {\n  padding-top: 33px;\n  padding-bottom: 33px; }\n\n.px-33 {\n  padding-right: 33px;\n  padding-left: 33px; }\n\n.p-34 {\n  padding: 34px; }\n\n.pt-34 {\n  padding-top: 34px; }\n\n.pr-34 {\n  padding-right: 34px; }\n\n.pb-34 {\n  padding-bottom: 34px; }\n\n.pl-34 {\n  padding-left: 34px; }\n\n.py-34 {\n  padding-top: 34px;\n  padding-bottom: 34px; }\n\n.px-34 {\n  padding-right: 34px;\n  padding-left: 34px; }\n\n.p-35 {\n  padding: 35px; }\n\n.pt-35 {\n  padding-top: 35px; }\n\n.pr-35 {\n  padding-right: 35px; }\n\n.pb-35 {\n  padding-bottom: 35px; }\n\n.pl-35 {\n  padding-left: 35px; }\n\n.py-35 {\n  padding-top: 35px;\n  padding-bottom: 35px; }\n\n.px-35 {\n  padding-right: 35px;\n  padding-left: 35px; }\n\n.p-36 {\n  padding: 36px; }\n\n.pt-36 {\n  padding-top: 36px; }\n\n.pr-36 {\n  padding-right: 36px; }\n\n.pb-36 {\n  padding-bottom: 36px; }\n\n.pl-36 {\n  padding-left: 36px; }\n\n.py-36 {\n  padding-top: 36px;\n  padding-bottom: 36px; }\n\n.px-36 {\n  padding-right: 36px;\n  padding-left: 36px; }\n\n.p-37 {\n  padding: 37px; }\n\n.pt-37 {\n  padding-top: 37px; }\n\n.pr-37 {\n  padding-right: 37px; }\n\n.pb-37 {\n  padding-bottom: 37px; }\n\n.pl-37 {\n  padding-left: 37px; }\n\n.py-37 {\n  padding-top: 37px;\n  padding-bottom: 37px; }\n\n.px-37 {\n  padding-right: 37px;\n  padding-left: 37px; }\n\n.p-38 {\n  padding: 38px; }\n\n.pt-38 {\n  padding-top: 38px; }\n\n.pr-38 {\n  padding-right: 38px; }\n\n.pb-38 {\n  padding-bottom: 38px; }\n\n.pl-38 {\n  padding-left: 38px; }\n\n.py-38 {\n  padding-top: 38px;\n  padding-bottom: 38px; }\n\n.px-38 {\n  padding-right: 38px;\n  padding-left: 38px; }\n\n.p-39 {\n  padding: 39px; }\n\n.pt-39 {\n  padding-top: 39px; }\n\n.pr-39 {\n  padding-right: 39px; }\n\n.pb-39 {\n  padding-bottom: 39px; }\n\n.pl-39 {\n  padding-left: 39px; }\n\n.py-39 {\n  padding-top: 39px;\n  padding-bottom: 39px; }\n\n.px-39 {\n  padding-right: 39px;\n  padding-left: 39px; }\n\n.p-40 {\n  padding: 40px; }\n\n.pt-40 {\n  padding-top: 40px; }\n\n.pr-40 {\n  padding-right: 40px; }\n\n.pb-40 {\n  padding-bottom: 40px; }\n\n.pl-40 {\n  padding-left: 40px; }\n\n.py-40 {\n  padding-top: 40px;\n  padding-bottom: 40px; }\n\n.px-40 {\n  padding-right: 40px;\n  padding-left: 40px; }\n\n.m-0 {\n  margin: 0px; }\n\n.mt-0 {\n  margin-top: 0px; }\n\n.mr-0 {\n  margin-right: 0px; }\n\n.mb-0 {\n  margin-bottom: 0px; }\n\n.ml-0 {\n  margin-left: 0px; }\n\n.my-0 {\n  margin-top: 0px;\n  margin-bottom: 0px; }\n\n.mx-0 {\n  margin-right: 0px;\n  margin-left: 0px; }\n\n.m-1 {\n  margin: 1px; }\n\n.mt-1 {\n  margin-top: 1px; }\n\n.mr-1 {\n  margin-right: 1px; }\n\n.mb-1 {\n  margin-bottom: 1px; }\n\n.ml-1 {\n  margin-left: 1px; }\n\n.my-1 {\n  margin-top: 1px;\n  margin-bottom: 1px; }\n\n.mx-1 {\n  margin-right: 1px;\n  margin-left: 1px; }\n\n.m-2 {\n  margin: 2px; }\n\n.mt-2 {\n  margin-top: 2px; }\n\n.mr-2 {\n  margin-right: 2px; }\n\n.mb-2 {\n  margin-bottom: 2px; }\n\n.ml-2 {\n  margin-left: 2px; }\n\n.my-2 {\n  margin-top: 2px;\n  margin-bottom: 2px; }\n\n.mx-2 {\n  margin-right: 2px;\n  margin-left: 2px; }\n\n.m-3 {\n  margin: 3px; }\n\n.mt-3 {\n  margin-top: 3px; }\n\n.mr-3 {\n  margin-right: 3px; }\n\n.mb-3 {\n  margin-bottom: 3px; }\n\n.ml-3 {\n  margin-left: 3px; }\n\n.my-3 {\n  margin-top: 3px;\n  margin-bottom: 3px; }\n\n.mx-3 {\n  margin-right: 3px;\n  margin-left: 3px; }\n\n.m-4 {\n  margin: 4px; }\n\n.mt-4 {\n  margin-top: 4px; }\n\n.mr-4 {\n  margin-right: 4px; }\n\n.mb-4 {\n  margin-bottom: 4px; }\n\n.ml-4 {\n  margin-left: 4px; }\n\n.my-4 {\n  margin-top: 4px;\n  margin-bottom: 4px; }\n\n.mx-4 {\n  margin-right: 4px;\n  margin-left: 4px; }\n\n.m-5 {\n  margin: 5px; }\n\n.mt-5 {\n  margin-top: 5px; }\n\n.mr-5 {\n  margin-right: 5px; }\n\n.mb-5 {\n  margin-bottom: 5px; }\n\n.ml-5 {\n  margin-left: 5px; }\n\n.my-5 {\n  margin-top: 5px;\n  margin-bottom: 5px; }\n\n.mx-5 {\n  margin-right: 5px;\n  margin-left: 5px; }\n\n.m-6 {\n  margin: 6px; }\n\n.mt-6 {\n  margin-top: 6px; }\n\n.mr-6 {\n  margin-right: 6px; }\n\n.mb-6 {\n  margin-bottom: 6px; }\n\n.ml-6 {\n  margin-left: 6px; }\n\n.my-6 {\n  margin-top: 6px;\n  margin-bottom: 6px; }\n\n.mx-6 {\n  margin-right: 6px;\n  margin-left: 6px; }\n\n.m-7 {\n  margin: 7px; }\n\n.mt-7 {\n  margin-top: 7px; }\n\n.mr-7 {\n  margin-right: 7px; }\n\n.mb-7 {\n  margin-bottom: 7px; }\n\n.ml-7 {\n  margin-left: 7px; }\n\n.my-7 {\n  margin-top: 7px;\n  margin-bottom: 7px; }\n\n.mx-7 {\n  margin-right: 7px;\n  margin-left: 7px; }\n\n.m-8 {\n  margin: 8px; }\n\n.mt-8 {\n  margin-top: 8px; }\n\n.mr-8 {\n  margin-right: 8px; }\n\n.mb-8 {\n  margin-bottom: 8px; }\n\n.ml-8 {\n  margin-left: 8px; }\n\n.my-8 {\n  margin-top: 8px;\n  margin-bottom: 8px; }\n\n.mx-8 {\n  margin-right: 8px;\n  margin-left: 8px; }\n\n.m-9 {\n  margin: 9px; }\n\n.mt-9 {\n  margin-top: 9px; }\n\n.mr-9 {\n  margin-right: 9px; }\n\n.mb-9 {\n  margin-bottom: 9px; }\n\n.ml-9 {\n  margin-left: 9px; }\n\n.my-9 {\n  margin-top: 9px;\n  margin-bottom: 9px; }\n\n.mx-9 {\n  margin-right: 9px;\n  margin-left: 9px; }\n\n.m-10 {\n  margin: 10px; }\n\n.mt-10 {\n  margin-top: 10px; }\n\n.mr-10 {\n  margin-right: 10px; }\n\n.mb-10 {\n  margin-bottom: 10px; }\n\n.ml-10 {\n  margin-left: 10px; }\n\n.my-10 {\n  margin-top: 10px;\n  margin-bottom: 10px; }\n\n.mx-10 {\n  margin-right: 10px;\n  margin-left: 10px; }\n\n.m-11 {\n  margin: 11px; }\n\n.mt-11 {\n  margin-top: 11px; }\n\n.mr-11 {\n  margin-right: 11px; }\n\n.mb-11 {\n  margin-bottom: 11px; }\n\n.ml-11 {\n  margin-left: 11px; }\n\n.my-11 {\n  margin-top: 11px;\n  margin-bottom: 11px; }\n\n.mx-11 {\n  margin-right: 11px;\n  margin-left: 11px; }\n\n.m-12 {\n  margin: 12px; }\n\n.mt-12 {\n  margin-top: 12px; }\n\n.mr-12 {\n  margin-right: 12px; }\n\n.mb-12 {\n  margin-bottom: 12px; }\n\n.ml-12 {\n  margin-left: 12px; }\n\n.my-12 {\n  margin-top: 12px;\n  margin-bottom: 12px; }\n\n.mx-12 {\n  margin-right: 12px;\n  margin-left: 12px; }\n\n.m-13 {\n  margin: 13px; }\n\n.mt-13 {\n  margin-top: 13px; }\n\n.mr-13 {\n  margin-right: 13px; }\n\n.mb-13 {\n  margin-bottom: 13px; }\n\n.ml-13 {\n  margin-left: 13px; }\n\n.my-13 {\n  margin-top: 13px;\n  margin-bottom: 13px; }\n\n.mx-13 {\n  margin-right: 13px;\n  margin-left: 13px; }\n\n.m-14 {\n  margin: 14px; }\n\n.mt-14 {\n  margin-top: 14px; }\n\n.mr-14 {\n  margin-right: 14px; }\n\n.mb-14 {\n  margin-bottom: 14px; }\n\n.ml-14 {\n  margin-left: 14px; }\n\n.my-14 {\n  margin-top: 14px;\n  margin-bottom: 14px; }\n\n.mx-14 {\n  margin-right: 14px;\n  margin-left: 14px; }\n\n.m-15 {\n  margin: 15px; }\n\n.mt-15 {\n  margin-top: 15px; }\n\n.mr-15 {\n  margin-right: 15px; }\n\n.mb-15 {\n  margin-bottom: 15px; }\n\n.ml-15 {\n  margin-left: 15px; }\n\n.my-15 {\n  margin-top: 15px;\n  margin-bottom: 15px; }\n\n.mx-15 {\n  margin-right: 15px;\n  margin-left: 15px; }\n\n.m-16 {\n  margin: 16px; }\n\n.mt-16 {\n  margin-top: 16px; }\n\n.mr-16 {\n  margin-right: 16px; }\n\n.mb-16 {\n  margin-bottom: 16px; }\n\n.ml-16 {\n  margin-left: 16px; }\n\n.my-16 {\n  margin-top: 16px;\n  margin-bottom: 16px; }\n\n.mx-16 {\n  margin-right: 16px;\n  margin-left: 16px; }\n\n.m-17 {\n  margin: 17px; }\n\n.mt-17 {\n  margin-top: 17px; }\n\n.mr-17 {\n  margin-right: 17px; }\n\n.mb-17 {\n  margin-bottom: 17px; }\n\n.ml-17 {\n  margin-left: 17px; }\n\n.my-17 {\n  margin-top: 17px;\n  margin-bottom: 17px; }\n\n.mx-17 {\n  margin-right: 17px;\n  margin-left: 17px; }\n\n.m-18 {\n  margin: 18px; }\n\n.mt-18 {\n  margin-top: 18px; }\n\n.mr-18 {\n  margin-right: 18px; }\n\n.mb-18 {\n  margin-bottom: 18px; }\n\n.ml-18 {\n  margin-left: 18px; }\n\n.my-18 {\n  margin-top: 18px;\n  margin-bottom: 18px; }\n\n.mx-18 {\n  margin-right: 18px;\n  margin-left: 18px; }\n\n.m-19 {\n  margin: 19px; }\n\n.mt-19 {\n  margin-top: 19px; }\n\n.mr-19 {\n  margin-right: 19px; }\n\n.mb-19 {\n  margin-bottom: 19px; }\n\n.ml-19 {\n  margin-left: 19px; }\n\n.my-19 {\n  margin-top: 19px;\n  margin-bottom: 19px; }\n\n.mx-19 {\n  margin-right: 19px;\n  margin-left: 19px; }\n\n.m-20 {\n  margin: 20px; }\n\n.mt-20 {\n  margin-top: 20px; }\n\n.mr-20 {\n  margin-right: 20px; }\n\n.mb-20 {\n  margin-bottom: 20px; }\n\n.ml-20 {\n  margin-left: 20px; }\n\n.my-20 {\n  margin-top: 20px;\n  margin-bottom: 20px; }\n\n.mx-20 {\n  margin-right: 20px;\n  margin-left: 20px; }\n\n.m-21 {\n  margin: 21px; }\n\n.mt-21 {\n  margin-top: 21px; }\n\n.mr-21 {\n  margin-right: 21px; }\n\n.mb-21 {\n  margin-bottom: 21px; }\n\n.ml-21 {\n  margin-left: 21px; }\n\n.my-21 {\n  margin-top: 21px;\n  margin-bottom: 21px; }\n\n.mx-21 {\n  margin-right: 21px;\n  margin-left: 21px; }\n\n.m-22 {\n  margin: 22px; }\n\n.mt-22 {\n  margin-top: 22px; }\n\n.mr-22 {\n  margin-right: 22px; }\n\n.mb-22 {\n  margin-bottom: 22px; }\n\n.ml-22 {\n  margin-left: 22px; }\n\n.my-22 {\n  margin-top: 22px;\n  margin-bottom: 22px; }\n\n.mx-22 {\n  margin-right: 22px;\n  margin-left: 22px; }\n\n.m-23 {\n  margin: 23px; }\n\n.mt-23 {\n  margin-top: 23px; }\n\n.mr-23 {\n  margin-right: 23px; }\n\n.mb-23 {\n  margin-bottom: 23px; }\n\n.ml-23 {\n  margin-left: 23px; }\n\n.my-23 {\n  margin-top: 23px;\n  margin-bottom: 23px; }\n\n.mx-23 {\n  margin-right: 23px;\n  margin-left: 23px; }\n\n.m-24 {\n  margin: 24px; }\n\n.mt-24 {\n  margin-top: 24px; }\n\n.mr-24 {\n  margin-right: 24px; }\n\n.mb-24 {\n  margin-bottom: 24px; }\n\n.ml-24 {\n  margin-left: 24px; }\n\n.my-24 {\n  margin-top: 24px;\n  margin-bottom: 24px; }\n\n.mx-24 {\n  margin-right: 24px;\n  margin-left: 24px; }\n\n.m-25 {\n  margin: 25px; }\n\n.mt-25 {\n  margin-top: 25px; }\n\n.mr-25 {\n  margin-right: 25px; }\n\n.mb-25 {\n  margin-bottom: 25px; }\n\n.ml-25 {\n  margin-left: 25px; }\n\n.my-25 {\n  margin-top: 25px;\n  margin-bottom: 25px; }\n\n.mx-25 {\n  margin-right: 25px;\n  margin-left: 25px; }\n\n.m-26 {\n  margin: 26px; }\n\n.mt-26 {\n  margin-top: 26px; }\n\n.mr-26 {\n  margin-right: 26px; }\n\n.mb-26 {\n  margin-bottom: 26px; }\n\n.ml-26 {\n  margin-left: 26px; }\n\n.my-26 {\n  margin-top: 26px;\n  margin-bottom: 26px; }\n\n.mx-26 {\n  margin-right: 26px;\n  margin-left: 26px; }\n\n.m-27 {\n  margin: 27px; }\n\n.mt-27 {\n  margin-top: 27px; }\n\n.mr-27 {\n  margin-right: 27px; }\n\n.mb-27 {\n  margin-bottom: 27px; }\n\n.ml-27 {\n  margin-left: 27px; }\n\n.my-27 {\n  margin-top: 27px;\n  margin-bottom: 27px; }\n\n.mx-27 {\n  margin-right: 27px;\n  margin-left: 27px; }\n\n.m-28 {\n  margin: 28px; }\n\n.mt-28 {\n  margin-top: 28px; }\n\n.mr-28 {\n  margin-right: 28px; }\n\n.mb-28 {\n  margin-bottom: 28px; }\n\n.ml-28 {\n  margin-left: 28px; }\n\n.my-28 {\n  margin-top: 28px;\n  margin-bottom: 28px; }\n\n.mx-28 {\n  margin-right: 28px;\n  margin-left: 28px; }\n\n.m-29 {\n  margin: 29px; }\n\n.mt-29 {\n  margin-top: 29px; }\n\n.mr-29 {\n  margin-right: 29px; }\n\n.mb-29 {\n  margin-bottom: 29px; }\n\n.ml-29 {\n  margin-left: 29px; }\n\n.my-29 {\n  margin-top: 29px;\n  margin-bottom: 29px; }\n\n.mx-29 {\n  margin-right: 29px;\n  margin-left: 29px; }\n\n.m-30 {\n  margin: 30px; }\n\n.mt-30 {\n  margin-top: 30px; }\n\n.mr-30 {\n  margin-right: 30px; }\n\n.mb-30 {\n  margin-bottom: 30px; }\n\n.ml-30 {\n  margin-left: 30px; }\n\n.my-30 {\n  margin-top: 30px;\n  margin-bottom: 30px; }\n\n.mx-30 {\n  margin-right: 30px;\n  margin-left: 30px; }\n\n.m-31 {\n  margin: 31px; }\n\n.mt-31 {\n  margin-top: 31px; }\n\n.mr-31 {\n  margin-right: 31px; }\n\n.mb-31 {\n  margin-bottom: 31px; }\n\n.ml-31 {\n  margin-left: 31px; }\n\n.my-31 {\n  margin-top: 31px;\n  margin-bottom: 31px; }\n\n.mx-31 {\n  margin-right: 31px;\n  margin-left: 31px; }\n\n.m-32 {\n  margin: 32px; }\n\n.mt-32 {\n  margin-top: 32px; }\n\n.mr-32 {\n  margin-right: 32px; }\n\n.mb-32 {\n  margin-bottom: 32px; }\n\n.ml-32 {\n  margin-left: 32px; }\n\n.my-32 {\n  margin-top: 32px;\n  margin-bottom: 32px; }\n\n.mx-32 {\n  margin-right: 32px;\n  margin-left: 32px; }\n\n.m-33 {\n  margin: 33px; }\n\n.mt-33 {\n  margin-top: 33px; }\n\n.mr-33 {\n  margin-right: 33px; }\n\n.mb-33 {\n  margin-bottom: 33px; }\n\n.ml-33 {\n  margin-left: 33px; }\n\n.my-33 {\n  margin-top: 33px;\n  margin-bottom: 33px; }\n\n.mx-33 {\n  margin-right: 33px;\n  margin-left: 33px; }\n\n.m-34 {\n  margin: 34px; }\n\n.mt-34 {\n  margin-top: 34px; }\n\n.mr-34 {\n  margin-right: 34px; }\n\n.mb-34 {\n  margin-bottom: 34px; }\n\n.ml-34 {\n  margin-left: 34px; }\n\n.my-34 {\n  margin-top: 34px;\n  margin-bottom: 34px; }\n\n.mx-34 {\n  margin-right: 34px;\n  margin-left: 34px; }\n\n.m-35 {\n  margin: 35px; }\n\n.mt-35 {\n  margin-top: 35px; }\n\n.mr-35 {\n  margin-right: 35px; }\n\n.mb-35 {\n  margin-bottom: 35px; }\n\n.ml-35 {\n  margin-left: 35px; }\n\n.my-35 {\n  margin-top: 35px;\n  margin-bottom: 35px; }\n\n.mx-35 {\n  margin-right: 35px;\n  margin-left: 35px; }\n\n.m-36 {\n  margin: 36px; }\n\n.mt-36 {\n  margin-top: 36px; }\n\n.mr-36 {\n  margin-right: 36px; }\n\n.mb-36 {\n  margin-bottom: 36px; }\n\n.ml-36 {\n  margin-left: 36px; }\n\n.my-36 {\n  margin-top: 36px;\n  margin-bottom: 36px; }\n\n.mx-36 {\n  margin-right: 36px;\n  margin-left: 36px; }\n\n.m-37 {\n  margin: 37px; }\n\n.mt-37 {\n  margin-top: 37px; }\n\n.mr-37 {\n  margin-right: 37px; }\n\n.mb-37 {\n  margin-bottom: 37px; }\n\n.ml-37 {\n  margin-left: 37px; }\n\n.my-37 {\n  margin-top: 37px;\n  margin-bottom: 37px; }\n\n.mx-37 {\n  margin-right: 37px;\n  margin-left: 37px; }\n\n.m-38 {\n  margin: 38px; }\n\n.mt-38 {\n  margin-top: 38px; }\n\n.mr-38 {\n  margin-right: 38px; }\n\n.mb-38 {\n  margin-bottom: 38px; }\n\n.ml-38 {\n  margin-left: 38px; }\n\n.my-38 {\n  margin-top: 38px;\n  margin-bottom: 38px; }\n\n.mx-38 {\n  margin-right: 38px;\n  margin-left: 38px; }\n\n.m-39 {\n  margin: 39px; }\n\n.mt-39 {\n  margin-top: 39px; }\n\n.mr-39 {\n  margin-right: 39px; }\n\n.mb-39 {\n  margin-bottom: 39px; }\n\n.ml-39 {\n  margin-left: 39px; }\n\n.my-39 {\n  margin-top: 39px;\n  margin-bottom: 39px; }\n\n.mx-39 {\n  margin-right: 39px;\n  margin-left: 39px; }\n\n.m-40 {\n  margin: 40px; }\n\n.mt-40 {\n  margin-top: 40px; }\n\n.mr-40 {\n  margin-right: 40px; }\n\n.mb-40 {\n  margin-bottom: 40px; }\n\n.ml-40 {\n  margin-left: 40px; }\n\n.my-40 {\n  margin-top: 40px;\n  margin-bottom: 40px; }\n\n.mx-40 {\n  margin-right: 40px;\n  margin-left: 40px; }\n\n.absolute-full {\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0; }\n", ""]);
+exports.push([module.i, "html {\n  font-family: Arial, sans-serif;\n  font-size: 14px; }\n\n* {\n  padding: 0;\n  margin: 0; }\n\nheader {\n  background: #e2e5ea;\n  color: #b2b8c3; }\n  header a,\n  header a:hover,\n  header a:visited {\n    color: #b2b8c3; }\n\n.btn {\n  outline: none;\n  border: none;\n  background: none;\n  font-size: inherit;\n  font-family: inherit;\n  padding: 10px;\n  background: #e2e5ea;\n  color: #5287de; }\n  .btn.btn-tight {\n    padding: 4px; }\n  .btn:hover {\n    background: #ebedf0;\n    color: #5287de; }\n\n.radio-group {\n  display: inline-block; }\n  .radio-group > * {\n    padding: 10px; }\n  .radio-group label {\n    background: #f0f2f5;\n    color: #878e98; }\n  .radio-group .radio-btn.selected {\n    background: #d3d8df;\n    box-shadow: 0 0 4px #bec3cc inset;\n    color: #3d78da; }\n\n/** util clases **/\n.flex-row {\n  display: flex;\n  flex-direction: row; }\n\n.flex-column {\n  display: flex;\n  flex-direction: column; }\n\n.flex-none {\n  flex: none; }\n\n.flex-auto {\n  flex: auto; }\n\n.flex-initial {\n  flex: initial; }\n\n.justify-content-around {\n  justify-content: space-around; }\n\n.justify-content-between {\n  justify-content: space-between; }\n\n.overflow-auto {\n  overflow: auto; }\n\n.overflow-y-auto {\n  overflow-y: auto; }\n\n.overflow-x-auto {\n  overflow-y: auto; }\n\n.overflow-hidden {\n  overflow: hidden; }\n\n.overflow-y-hidden {\n  overflow-y: hidden; }\n\n.overflow-x-hidden {\n  overflow-y: hidden; }\n\n.text-left {\n  text-align: left; }\n\n.text-center {\n  text-align: center; }\n\n.text-right {\n  text-align: right; }\n\n.text-gray-darker {\n  color: #b2b8c3; }\n\n.bg-gray-darker {\n  background: #b2b8c3; }\n\n.text-gray-darkest {\n  color: #8a92a0; }\n\n.bg-gray-darkest {\n  background: #8a92a0; }\n\n.p-0 {\n  padding: 0px; }\n\n.pt-0 {\n  padding-top: 0px; }\n\n.pr-0 {\n  padding-right: 0px; }\n\n.pb-0 {\n  padding-bottom: 0px; }\n\n.pl-0 {\n  padding-left: 0px; }\n\n.py-0 {\n  padding-top: 0px;\n  padding-bottom: 0px; }\n\n.px-0 {\n  padding-right: 0px;\n  padding-left: 0px; }\n\n.p-1 {\n  padding: 1px; }\n\n.pt-1 {\n  padding-top: 1px; }\n\n.pr-1 {\n  padding-right: 1px; }\n\n.pb-1 {\n  padding-bottom: 1px; }\n\n.pl-1 {\n  padding-left: 1px; }\n\n.py-1 {\n  padding-top: 1px;\n  padding-bottom: 1px; }\n\n.px-1 {\n  padding-right: 1px;\n  padding-left: 1px; }\n\n.p-2 {\n  padding: 2px; }\n\n.pt-2 {\n  padding-top: 2px; }\n\n.pr-2 {\n  padding-right: 2px; }\n\n.pb-2 {\n  padding-bottom: 2px; }\n\n.pl-2 {\n  padding-left: 2px; }\n\n.py-2 {\n  padding-top: 2px;\n  padding-bottom: 2px; }\n\n.px-2 {\n  padding-right: 2px;\n  padding-left: 2px; }\n\n.p-3 {\n  padding: 3px; }\n\n.pt-3 {\n  padding-top: 3px; }\n\n.pr-3 {\n  padding-right: 3px; }\n\n.pb-3 {\n  padding-bottom: 3px; }\n\n.pl-3 {\n  padding-left: 3px; }\n\n.py-3 {\n  padding-top: 3px;\n  padding-bottom: 3px; }\n\n.px-3 {\n  padding-right: 3px;\n  padding-left: 3px; }\n\n.p-4 {\n  padding: 4px; }\n\n.pt-4 {\n  padding-top: 4px; }\n\n.pr-4 {\n  padding-right: 4px; }\n\n.pb-4 {\n  padding-bottom: 4px; }\n\n.pl-4 {\n  padding-left: 4px; }\n\n.py-4 {\n  padding-top: 4px;\n  padding-bottom: 4px; }\n\n.px-4 {\n  padding-right: 4px;\n  padding-left: 4px; }\n\n.p-5 {\n  padding: 5px; }\n\n.pt-5 {\n  padding-top: 5px; }\n\n.pr-5 {\n  padding-right: 5px; }\n\n.pb-5 {\n  padding-bottom: 5px; }\n\n.pl-5 {\n  padding-left: 5px; }\n\n.py-5 {\n  padding-top: 5px;\n  padding-bottom: 5px; }\n\n.px-5 {\n  padding-right: 5px;\n  padding-left: 5px; }\n\n.p-6 {\n  padding: 6px; }\n\n.pt-6 {\n  padding-top: 6px; }\n\n.pr-6 {\n  padding-right: 6px; }\n\n.pb-6 {\n  padding-bottom: 6px; }\n\n.pl-6 {\n  padding-left: 6px; }\n\n.py-6 {\n  padding-top: 6px;\n  padding-bottom: 6px; }\n\n.px-6 {\n  padding-right: 6px;\n  padding-left: 6px; }\n\n.p-7 {\n  padding: 7px; }\n\n.pt-7 {\n  padding-top: 7px; }\n\n.pr-7 {\n  padding-right: 7px; }\n\n.pb-7 {\n  padding-bottom: 7px; }\n\n.pl-7 {\n  padding-left: 7px; }\n\n.py-7 {\n  padding-top: 7px;\n  padding-bottom: 7px; }\n\n.px-7 {\n  padding-right: 7px;\n  padding-left: 7px; }\n\n.p-8 {\n  padding: 8px; }\n\n.pt-8 {\n  padding-top: 8px; }\n\n.pr-8 {\n  padding-right: 8px; }\n\n.pb-8 {\n  padding-bottom: 8px; }\n\n.pl-8 {\n  padding-left: 8px; }\n\n.py-8 {\n  padding-top: 8px;\n  padding-bottom: 8px; }\n\n.px-8 {\n  padding-right: 8px;\n  padding-left: 8px; }\n\n.p-9 {\n  padding: 9px; }\n\n.pt-9 {\n  padding-top: 9px; }\n\n.pr-9 {\n  padding-right: 9px; }\n\n.pb-9 {\n  padding-bottom: 9px; }\n\n.pl-9 {\n  padding-left: 9px; }\n\n.py-9 {\n  padding-top: 9px;\n  padding-bottom: 9px; }\n\n.px-9 {\n  padding-right: 9px;\n  padding-left: 9px; }\n\n.p-10 {\n  padding: 10px; }\n\n.pt-10 {\n  padding-top: 10px; }\n\n.pr-10 {\n  padding-right: 10px; }\n\n.pb-10 {\n  padding-bottom: 10px; }\n\n.pl-10 {\n  padding-left: 10px; }\n\n.py-10 {\n  padding-top: 10px;\n  padding-bottom: 10px; }\n\n.px-10 {\n  padding-right: 10px;\n  padding-left: 10px; }\n\n.p-11 {\n  padding: 11px; }\n\n.pt-11 {\n  padding-top: 11px; }\n\n.pr-11 {\n  padding-right: 11px; }\n\n.pb-11 {\n  padding-bottom: 11px; }\n\n.pl-11 {\n  padding-left: 11px; }\n\n.py-11 {\n  padding-top: 11px;\n  padding-bottom: 11px; }\n\n.px-11 {\n  padding-right: 11px;\n  padding-left: 11px; }\n\n.p-12 {\n  padding: 12px; }\n\n.pt-12 {\n  padding-top: 12px; }\n\n.pr-12 {\n  padding-right: 12px; }\n\n.pb-12 {\n  padding-bottom: 12px; }\n\n.pl-12 {\n  padding-left: 12px; }\n\n.py-12 {\n  padding-top: 12px;\n  padding-bottom: 12px; }\n\n.px-12 {\n  padding-right: 12px;\n  padding-left: 12px; }\n\n.p-13 {\n  padding: 13px; }\n\n.pt-13 {\n  padding-top: 13px; }\n\n.pr-13 {\n  padding-right: 13px; }\n\n.pb-13 {\n  padding-bottom: 13px; }\n\n.pl-13 {\n  padding-left: 13px; }\n\n.py-13 {\n  padding-top: 13px;\n  padding-bottom: 13px; }\n\n.px-13 {\n  padding-right: 13px;\n  padding-left: 13px; }\n\n.p-14 {\n  padding: 14px; }\n\n.pt-14 {\n  padding-top: 14px; }\n\n.pr-14 {\n  padding-right: 14px; }\n\n.pb-14 {\n  padding-bottom: 14px; }\n\n.pl-14 {\n  padding-left: 14px; }\n\n.py-14 {\n  padding-top: 14px;\n  padding-bottom: 14px; }\n\n.px-14 {\n  padding-right: 14px;\n  padding-left: 14px; }\n\n.p-15 {\n  padding: 15px; }\n\n.pt-15 {\n  padding-top: 15px; }\n\n.pr-15 {\n  padding-right: 15px; }\n\n.pb-15 {\n  padding-bottom: 15px; }\n\n.pl-15 {\n  padding-left: 15px; }\n\n.py-15 {\n  padding-top: 15px;\n  padding-bottom: 15px; }\n\n.px-15 {\n  padding-right: 15px;\n  padding-left: 15px; }\n\n.p-16 {\n  padding: 16px; }\n\n.pt-16 {\n  padding-top: 16px; }\n\n.pr-16 {\n  padding-right: 16px; }\n\n.pb-16 {\n  padding-bottom: 16px; }\n\n.pl-16 {\n  padding-left: 16px; }\n\n.py-16 {\n  padding-top: 16px;\n  padding-bottom: 16px; }\n\n.px-16 {\n  padding-right: 16px;\n  padding-left: 16px; }\n\n.p-17 {\n  padding: 17px; }\n\n.pt-17 {\n  padding-top: 17px; }\n\n.pr-17 {\n  padding-right: 17px; }\n\n.pb-17 {\n  padding-bottom: 17px; }\n\n.pl-17 {\n  padding-left: 17px; }\n\n.py-17 {\n  padding-top: 17px;\n  padding-bottom: 17px; }\n\n.px-17 {\n  padding-right: 17px;\n  padding-left: 17px; }\n\n.p-18 {\n  padding: 18px; }\n\n.pt-18 {\n  padding-top: 18px; }\n\n.pr-18 {\n  padding-right: 18px; }\n\n.pb-18 {\n  padding-bottom: 18px; }\n\n.pl-18 {\n  padding-left: 18px; }\n\n.py-18 {\n  padding-top: 18px;\n  padding-bottom: 18px; }\n\n.px-18 {\n  padding-right: 18px;\n  padding-left: 18px; }\n\n.p-19 {\n  padding: 19px; }\n\n.pt-19 {\n  padding-top: 19px; }\n\n.pr-19 {\n  padding-right: 19px; }\n\n.pb-19 {\n  padding-bottom: 19px; }\n\n.pl-19 {\n  padding-left: 19px; }\n\n.py-19 {\n  padding-top: 19px;\n  padding-bottom: 19px; }\n\n.px-19 {\n  padding-right: 19px;\n  padding-left: 19px; }\n\n.p-20 {\n  padding: 20px; }\n\n.pt-20 {\n  padding-top: 20px; }\n\n.pr-20 {\n  padding-right: 20px; }\n\n.pb-20 {\n  padding-bottom: 20px; }\n\n.pl-20 {\n  padding-left: 20px; }\n\n.py-20 {\n  padding-top: 20px;\n  padding-bottom: 20px; }\n\n.px-20 {\n  padding-right: 20px;\n  padding-left: 20px; }\n\n.p-21 {\n  padding: 21px; }\n\n.pt-21 {\n  padding-top: 21px; }\n\n.pr-21 {\n  padding-right: 21px; }\n\n.pb-21 {\n  padding-bottom: 21px; }\n\n.pl-21 {\n  padding-left: 21px; }\n\n.py-21 {\n  padding-top: 21px;\n  padding-bottom: 21px; }\n\n.px-21 {\n  padding-right: 21px;\n  padding-left: 21px; }\n\n.p-22 {\n  padding: 22px; }\n\n.pt-22 {\n  padding-top: 22px; }\n\n.pr-22 {\n  padding-right: 22px; }\n\n.pb-22 {\n  padding-bottom: 22px; }\n\n.pl-22 {\n  padding-left: 22px; }\n\n.py-22 {\n  padding-top: 22px;\n  padding-bottom: 22px; }\n\n.px-22 {\n  padding-right: 22px;\n  padding-left: 22px; }\n\n.p-23 {\n  padding: 23px; }\n\n.pt-23 {\n  padding-top: 23px; }\n\n.pr-23 {\n  padding-right: 23px; }\n\n.pb-23 {\n  padding-bottom: 23px; }\n\n.pl-23 {\n  padding-left: 23px; }\n\n.py-23 {\n  padding-top: 23px;\n  padding-bottom: 23px; }\n\n.px-23 {\n  padding-right: 23px;\n  padding-left: 23px; }\n\n.p-24 {\n  padding: 24px; }\n\n.pt-24 {\n  padding-top: 24px; }\n\n.pr-24 {\n  padding-right: 24px; }\n\n.pb-24 {\n  padding-bottom: 24px; }\n\n.pl-24 {\n  padding-left: 24px; }\n\n.py-24 {\n  padding-top: 24px;\n  padding-bottom: 24px; }\n\n.px-24 {\n  padding-right: 24px;\n  padding-left: 24px; }\n\n.p-25 {\n  padding: 25px; }\n\n.pt-25 {\n  padding-top: 25px; }\n\n.pr-25 {\n  padding-right: 25px; }\n\n.pb-25 {\n  padding-bottom: 25px; }\n\n.pl-25 {\n  padding-left: 25px; }\n\n.py-25 {\n  padding-top: 25px;\n  padding-bottom: 25px; }\n\n.px-25 {\n  padding-right: 25px;\n  padding-left: 25px; }\n\n.p-26 {\n  padding: 26px; }\n\n.pt-26 {\n  padding-top: 26px; }\n\n.pr-26 {\n  padding-right: 26px; }\n\n.pb-26 {\n  padding-bottom: 26px; }\n\n.pl-26 {\n  padding-left: 26px; }\n\n.py-26 {\n  padding-top: 26px;\n  padding-bottom: 26px; }\n\n.px-26 {\n  padding-right: 26px;\n  padding-left: 26px; }\n\n.p-27 {\n  padding: 27px; }\n\n.pt-27 {\n  padding-top: 27px; }\n\n.pr-27 {\n  padding-right: 27px; }\n\n.pb-27 {\n  padding-bottom: 27px; }\n\n.pl-27 {\n  padding-left: 27px; }\n\n.py-27 {\n  padding-top: 27px;\n  padding-bottom: 27px; }\n\n.px-27 {\n  padding-right: 27px;\n  padding-left: 27px; }\n\n.p-28 {\n  padding: 28px; }\n\n.pt-28 {\n  padding-top: 28px; }\n\n.pr-28 {\n  padding-right: 28px; }\n\n.pb-28 {\n  padding-bottom: 28px; }\n\n.pl-28 {\n  padding-left: 28px; }\n\n.py-28 {\n  padding-top: 28px;\n  padding-bottom: 28px; }\n\n.px-28 {\n  padding-right: 28px;\n  padding-left: 28px; }\n\n.p-29 {\n  padding: 29px; }\n\n.pt-29 {\n  padding-top: 29px; }\n\n.pr-29 {\n  padding-right: 29px; }\n\n.pb-29 {\n  padding-bottom: 29px; }\n\n.pl-29 {\n  padding-left: 29px; }\n\n.py-29 {\n  padding-top: 29px;\n  padding-bottom: 29px; }\n\n.px-29 {\n  padding-right: 29px;\n  padding-left: 29px; }\n\n.p-30 {\n  padding: 30px; }\n\n.pt-30 {\n  padding-top: 30px; }\n\n.pr-30 {\n  padding-right: 30px; }\n\n.pb-30 {\n  padding-bottom: 30px; }\n\n.pl-30 {\n  padding-left: 30px; }\n\n.py-30 {\n  padding-top: 30px;\n  padding-bottom: 30px; }\n\n.px-30 {\n  padding-right: 30px;\n  padding-left: 30px; }\n\n.p-31 {\n  padding: 31px; }\n\n.pt-31 {\n  padding-top: 31px; }\n\n.pr-31 {\n  padding-right: 31px; }\n\n.pb-31 {\n  padding-bottom: 31px; }\n\n.pl-31 {\n  padding-left: 31px; }\n\n.py-31 {\n  padding-top: 31px;\n  padding-bottom: 31px; }\n\n.px-31 {\n  padding-right: 31px;\n  padding-left: 31px; }\n\n.p-32 {\n  padding: 32px; }\n\n.pt-32 {\n  padding-top: 32px; }\n\n.pr-32 {\n  padding-right: 32px; }\n\n.pb-32 {\n  padding-bottom: 32px; }\n\n.pl-32 {\n  padding-left: 32px; }\n\n.py-32 {\n  padding-top: 32px;\n  padding-bottom: 32px; }\n\n.px-32 {\n  padding-right: 32px;\n  padding-left: 32px; }\n\n.p-33 {\n  padding: 33px; }\n\n.pt-33 {\n  padding-top: 33px; }\n\n.pr-33 {\n  padding-right: 33px; }\n\n.pb-33 {\n  padding-bottom: 33px; }\n\n.pl-33 {\n  padding-left: 33px; }\n\n.py-33 {\n  padding-top: 33px;\n  padding-bottom: 33px; }\n\n.px-33 {\n  padding-right: 33px;\n  padding-left: 33px; }\n\n.p-34 {\n  padding: 34px; }\n\n.pt-34 {\n  padding-top: 34px; }\n\n.pr-34 {\n  padding-right: 34px; }\n\n.pb-34 {\n  padding-bottom: 34px; }\n\n.pl-34 {\n  padding-left: 34px; }\n\n.py-34 {\n  padding-top: 34px;\n  padding-bottom: 34px; }\n\n.px-34 {\n  padding-right: 34px;\n  padding-left: 34px; }\n\n.p-35 {\n  padding: 35px; }\n\n.pt-35 {\n  padding-top: 35px; }\n\n.pr-35 {\n  padding-right: 35px; }\n\n.pb-35 {\n  padding-bottom: 35px; }\n\n.pl-35 {\n  padding-left: 35px; }\n\n.py-35 {\n  padding-top: 35px;\n  padding-bottom: 35px; }\n\n.px-35 {\n  padding-right: 35px;\n  padding-left: 35px; }\n\n.p-36 {\n  padding: 36px; }\n\n.pt-36 {\n  padding-top: 36px; }\n\n.pr-36 {\n  padding-right: 36px; }\n\n.pb-36 {\n  padding-bottom: 36px; }\n\n.pl-36 {\n  padding-left: 36px; }\n\n.py-36 {\n  padding-top: 36px;\n  padding-bottom: 36px; }\n\n.px-36 {\n  padding-right: 36px;\n  padding-left: 36px; }\n\n.p-37 {\n  padding: 37px; }\n\n.pt-37 {\n  padding-top: 37px; }\n\n.pr-37 {\n  padding-right: 37px; }\n\n.pb-37 {\n  padding-bottom: 37px; }\n\n.pl-37 {\n  padding-left: 37px; }\n\n.py-37 {\n  padding-top: 37px;\n  padding-bottom: 37px; }\n\n.px-37 {\n  padding-right: 37px;\n  padding-left: 37px; }\n\n.p-38 {\n  padding: 38px; }\n\n.pt-38 {\n  padding-top: 38px; }\n\n.pr-38 {\n  padding-right: 38px; }\n\n.pb-38 {\n  padding-bottom: 38px; }\n\n.pl-38 {\n  padding-left: 38px; }\n\n.py-38 {\n  padding-top: 38px;\n  padding-bottom: 38px; }\n\n.px-38 {\n  padding-right: 38px;\n  padding-left: 38px; }\n\n.p-39 {\n  padding: 39px; }\n\n.pt-39 {\n  padding-top: 39px; }\n\n.pr-39 {\n  padding-right: 39px; }\n\n.pb-39 {\n  padding-bottom: 39px; }\n\n.pl-39 {\n  padding-left: 39px; }\n\n.py-39 {\n  padding-top: 39px;\n  padding-bottom: 39px; }\n\n.px-39 {\n  padding-right: 39px;\n  padding-left: 39px; }\n\n.p-40 {\n  padding: 40px; }\n\n.pt-40 {\n  padding-top: 40px; }\n\n.pr-40 {\n  padding-right: 40px; }\n\n.pb-40 {\n  padding-bottom: 40px; }\n\n.pl-40 {\n  padding-left: 40px; }\n\n.py-40 {\n  padding-top: 40px;\n  padding-bottom: 40px; }\n\n.px-40 {\n  padding-right: 40px;\n  padding-left: 40px; }\n\n.m-0 {\n  margin: 0px; }\n\n.mt-0 {\n  margin-top: 0px; }\n\n.mr-0 {\n  margin-right: 0px; }\n\n.mb-0 {\n  margin-bottom: 0px; }\n\n.ml-0 {\n  margin-left: 0px; }\n\n.my-0 {\n  margin-top: 0px;\n  margin-bottom: 0px; }\n\n.mx-0 {\n  margin-right: 0px;\n  margin-left: 0px; }\n\n.m-1 {\n  margin: 1px; }\n\n.mt-1 {\n  margin-top: 1px; }\n\n.mr-1 {\n  margin-right: 1px; }\n\n.mb-1 {\n  margin-bottom: 1px; }\n\n.ml-1 {\n  margin-left: 1px; }\n\n.my-1 {\n  margin-top: 1px;\n  margin-bottom: 1px; }\n\n.mx-1 {\n  margin-right: 1px;\n  margin-left: 1px; }\n\n.m-2 {\n  margin: 2px; }\n\n.mt-2 {\n  margin-top: 2px; }\n\n.mr-2 {\n  margin-right: 2px; }\n\n.mb-2 {\n  margin-bottom: 2px; }\n\n.ml-2 {\n  margin-left: 2px; }\n\n.my-2 {\n  margin-top: 2px;\n  margin-bottom: 2px; }\n\n.mx-2 {\n  margin-right: 2px;\n  margin-left: 2px; }\n\n.m-3 {\n  margin: 3px; }\n\n.mt-3 {\n  margin-top: 3px; }\n\n.mr-3 {\n  margin-right: 3px; }\n\n.mb-3 {\n  margin-bottom: 3px; }\n\n.ml-3 {\n  margin-left: 3px; }\n\n.my-3 {\n  margin-top: 3px;\n  margin-bottom: 3px; }\n\n.mx-3 {\n  margin-right: 3px;\n  margin-left: 3px; }\n\n.m-4 {\n  margin: 4px; }\n\n.mt-4 {\n  margin-top: 4px; }\n\n.mr-4 {\n  margin-right: 4px; }\n\n.mb-4 {\n  margin-bottom: 4px; }\n\n.ml-4 {\n  margin-left: 4px; }\n\n.my-4 {\n  margin-top: 4px;\n  margin-bottom: 4px; }\n\n.mx-4 {\n  margin-right: 4px;\n  margin-left: 4px; }\n\n.m-5 {\n  margin: 5px; }\n\n.mt-5 {\n  margin-top: 5px; }\n\n.mr-5 {\n  margin-right: 5px; }\n\n.mb-5 {\n  margin-bottom: 5px; }\n\n.ml-5 {\n  margin-left: 5px; }\n\n.my-5 {\n  margin-top: 5px;\n  margin-bottom: 5px; }\n\n.mx-5 {\n  margin-right: 5px;\n  margin-left: 5px; }\n\n.m-6 {\n  margin: 6px; }\n\n.mt-6 {\n  margin-top: 6px; }\n\n.mr-6 {\n  margin-right: 6px; }\n\n.mb-6 {\n  margin-bottom: 6px; }\n\n.ml-6 {\n  margin-left: 6px; }\n\n.my-6 {\n  margin-top: 6px;\n  margin-bottom: 6px; }\n\n.mx-6 {\n  margin-right: 6px;\n  margin-left: 6px; }\n\n.m-7 {\n  margin: 7px; }\n\n.mt-7 {\n  margin-top: 7px; }\n\n.mr-7 {\n  margin-right: 7px; }\n\n.mb-7 {\n  margin-bottom: 7px; }\n\n.ml-7 {\n  margin-left: 7px; }\n\n.my-7 {\n  margin-top: 7px;\n  margin-bottom: 7px; }\n\n.mx-7 {\n  margin-right: 7px;\n  margin-left: 7px; }\n\n.m-8 {\n  margin: 8px; }\n\n.mt-8 {\n  margin-top: 8px; }\n\n.mr-8 {\n  margin-right: 8px; }\n\n.mb-8 {\n  margin-bottom: 8px; }\n\n.ml-8 {\n  margin-left: 8px; }\n\n.my-8 {\n  margin-top: 8px;\n  margin-bottom: 8px; }\n\n.mx-8 {\n  margin-right: 8px;\n  margin-left: 8px; }\n\n.m-9 {\n  margin: 9px; }\n\n.mt-9 {\n  margin-top: 9px; }\n\n.mr-9 {\n  margin-right: 9px; }\n\n.mb-9 {\n  margin-bottom: 9px; }\n\n.ml-9 {\n  margin-left: 9px; }\n\n.my-9 {\n  margin-top: 9px;\n  margin-bottom: 9px; }\n\n.mx-9 {\n  margin-right: 9px;\n  margin-left: 9px; }\n\n.m-10 {\n  margin: 10px; }\n\n.mt-10 {\n  margin-top: 10px; }\n\n.mr-10 {\n  margin-right: 10px; }\n\n.mb-10 {\n  margin-bottom: 10px; }\n\n.ml-10 {\n  margin-left: 10px; }\n\n.my-10 {\n  margin-top: 10px;\n  margin-bottom: 10px; }\n\n.mx-10 {\n  margin-right: 10px;\n  margin-left: 10px; }\n\n.m-11 {\n  margin: 11px; }\n\n.mt-11 {\n  margin-top: 11px; }\n\n.mr-11 {\n  margin-right: 11px; }\n\n.mb-11 {\n  margin-bottom: 11px; }\n\n.ml-11 {\n  margin-left: 11px; }\n\n.my-11 {\n  margin-top: 11px;\n  margin-bottom: 11px; }\n\n.mx-11 {\n  margin-right: 11px;\n  margin-left: 11px; }\n\n.m-12 {\n  margin: 12px; }\n\n.mt-12 {\n  margin-top: 12px; }\n\n.mr-12 {\n  margin-right: 12px; }\n\n.mb-12 {\n  margin-bottom: 12px; }\n\n.ml-12 {\n  margin-left: 12px; }\n\n.my-12 {\n  margin-top: 12px;\n  margin-bottom: 12px; }\n\n.mx-12 {\n  margin-right: 12px;\n  margin-left: 12px; }\n\n.m-13 {\n  margin: 13px; }\n\n.mt-13 {\n  margin-top: 13px; }\n\n.mr-13 {\n  margin-right: 13px; }\n\n.mb-13 {\n  margin-bottom: 13px; }\n\n.ml-13 {\n  margin-left: 13px; }\n\n.my-13 {\n  margin-top: 13px;\n  margin-bottom: 13px; }\n\n.mx-13 {\n  margin-right: 13px;\n  margin-left: 13px; }\n\n.m-14 {\n  margin: 14px; }\n\n.mt-14 {\n  margin-top: 14px; }\n\n.mr-14 {\n  margin-right: 14px; }\n\n.mb-14 {\n  margin-bottom: 14px; }\n\n.ml-14 {\n  margin-left: 14px; }\n\n.my-14 {\n  margin-top: 14px;\n  margin-bottom: 14px; }\n\n.mx-14 {\n  margin-right: 14px;\n  margin-left: 14px; }\n\n.m-15 {\n  margin: 15px; }\n\n.mt-15 {\n  margin-top: 15px; }\n\n.mr-15 {\n  margin-right: 15px; }\n\n.mb-15 {\n  margin-bottom: 15px; }\n\n.ml-15 {\n  margin-left: 15px; }\n\n.my-15 {\n  margin-top: 15px;\n  margin-bottom: 15px; }\n\n.mx-15 {\n  margin-right: 15px;\n  margin-left: 15px; }\n\n.m-16 {\n  margin: 16px; }\n\n.mt-16 {\n  margin-top: 16px; }\n\n.mr-16 {\n  margin-right: 16px; }\n\n.mb-16 {\n  margin-bottom: 16px; }\n\n.ml-16 {\n  margin-left: 16px; }\n\n.my-16 {\n  margin-top: 16px;\n  margin-bottom: 16px; }\n\n.mx-16 {\n  margin-right: 16px;\n  margin-left: 16px; }\n\n.m-17 {\n  margin: 17px; }\n\n.mt-17 {\n  margin-top: 17px; }\n\n.mr-17 {\n  margin-right: 17px; }\n\n.mb-17 {\n  margin-bottom: 17px; }\n\n.ml-17 {\n  margin-left: 17px; }\n\n.my-17 {\n  margin-top: 17px;\n  margin-bottom: 17px; }\n\n.mx-17 {\n  margin-right: 17px;\n  margin-left: 17px; }\n\n.m-18 {\n  margin: 18px; }\n\n.mt-18 {\n  margin-top: 18px; }\n\n.mr-18 {\n  margin-right: 18px; }\n\n.mb-18 {\n  margin-bottom: 18px; }\n\n.ml-18 {\n  margin-left: 18px; }\n\n.my-18 {\n  margin-top: 18px;\n  margin-bottom: 18px; }\n\n.mx-18 {\n  margin-right: 18px;\n  margin-left: 18px; }\n\n.m-19 {\n  margin: 19px; }\n\n.mt-19 {\n  margin-top: 19px; }\n\n.mr-19 {\n  margin-right: 19px; }\n\n.mb-19 {\n  margin-bottom: 19px; }\n\n.ml-19 {\n  margin-left: 19px; }\n\n.my-19 {\n  margin-top: 19px;\n  margin-bottom: 19px; }\n\n.mx-19 {\n  margin-right: 19px;\n  margin-left: 19px; }\n\n.m-20 {\n  margin: 20px; }\n\n.mt-20 {\n  margin-top: 20px; }\n\n.mr-20 {\n  margin-right: 20px; }\n\n.mb-20 {\n  margin-bottom: 20px; }\n\n.ml-20 {\n  margin-left: 20px; }\n\n.my-20 {\n  margin-top: 20px;\n  margin-bottom: 20px; }\n\n.mx-20 {\n  margin-right: 20px;\n  margin-left: 20px; }\n\n.m-21 {\n  margin: 21px; }\n\n.mt-21 {\n  margin-top: 21px; }\n\n.mr-21 {\n  margin-right: 21px; }\n\n.mb-21 {\n  margin-bottom: 21px; }\n\n.ml-21 {\n  margin-left: 21px; }\n\n.my-21 {\n  margin-top: 21px;\n  margin-bottom: 21px; }\n\n.mx-21 {\n  margin-right: 21px;\n  margin-left: 21px; }\n\n.m-22 {\n  margin: 22px; }\n\n.mt-22 {\n  margin-top: 22px; }\n\n.mr-22 {\n  margin-right: 22px; }\n\n.mb-22 {\n  margin-bottom: 22px; }\n\n.ml-22 {\n  margin-left: 22px; }\n\n.my-22 {\n  margin-top: 22px;\n  margin-bottom: 22px; }\n\n.mx-22 {\n  margin-right: 22px;\n  margin-left: 22px; }\n\n.m-23 {\n  margin: 23px; }\n\n.mt-23 {\n  margin-top: 23px; }\n\n.mr-23 {\n  margin-right: 23px; }\n\n.mb-23 {\n  margin-bottom: 23px; }\n\n.ml-23 {\n  margin-left: 23px; }\n\n.my-23 {\n  margin-top: 23px;\n  margin-bottom: 23px; }\n\n.mx-23 {\n  margin-right: 23px;\n  margin-left: 23px; }\n\n.m-24 {\n  margin: 24px; }\n\n.mt-24 {\n  margin-top: 24px; }\n\n.mr-24 {\n  margin-right: 24px; }\n\n.mb-24 {\n  margin-bottom: 24px; }\n\n.ml-24 {\n  margin-left: 24px; }\n\n.my-24 {\n  margin-top: 24px;\n  margin-bottom: 24px; }\n\n.mx-24 {\n  margin-right: 24px;\n  margin-left: 24px; }\n\n.m-25 {\n  margin: 25px; }\n\n.mt-25 {\n  margin-top: 25px; }\n\n.mr-25 {\n  margin-right: 25px; }\n\n.mb-25 {\n  margin-bottom: 25px; }\n\n.ml-25 {\n  margin-left: 25px; }\n\n.my-25 {\n  margin-top: 25px;\n  margin-bottom: 25px; }\n\n.mx-25 {\n  margin-right: 25px;\n  margin-left: 25px; }\n\n.m-26 {\n  margin: 26px; }\n\n.mt-26 {\n  margin-top: 26px; }\n\n.mr-26 {\n  margin-right: 26px; }\n\n.mb-26 {\n  margin-bottom: 26px; }\n\n.ml-26 {\n  margin-left: 26px; }\n\n.my-26 {\n  margin-top: 26px;\n  margin-bottom: 26px; }\n\n.mx-26 {\n  margin-right: 26px;\n  margin-left: 26px; }\n\n.m-27 {\n  margin: 27px; }\n\n.mt-27 {\n  margin-top: 27px; }\n\n.mr-27 {\n  margin-right: 27px; }\n\n.mb-27 {\n  margin-bottom: 27px; }\n\n.ml-27 {\n  margin-left: 27px; }\n\n.my-27 {\n  margin-top: 27px;\n  margin-bottom: 27px; }\n\n.mx-27 {\n  margin-right: 27px;\n  margin-left: 27px; }\n\n.m-28 {\n  margin: 28px; }\n\n.mt-28 {\n  margin-top: 28px; }\n\n.mr-28 {\n  margin-right: 28px; }\n\n.mb-28 {\n  margin-bottom: 28px; }\n\n.ml-28 {\n  margin-left: 28px; }\n\n.my-28 {\n  margin-top: 28px;\n  margin-bottom: 28px; }\n\n.mx-28 {\n  margin-right: 28px;\n  margin-left: 28px; }\n\n.m-29 {\n  margin: 29px; }\n\n.mt-29 {\n  margin-top: 29px; }\n\n.mr-29 {\n  margin-right: 29px; }\n\n.mb-29 {\n  margin-bottom: 29px; }\n\n.ml-29 {\n  margin-left: 29px; }\n\n.my-29 {\n  margin-top: 29px;\n  margin-bottom: 29px; }\n\n.mx-29 {\n  margin-right: 29px;\n  margin-left: 29px; }\n\n.m-30 {\n  margin: 30px; }\n\n.mt-30 {\n  margin-top: 30px; }\n\n.mr-30 {\n  margin-right: 30px; }\n\n.mb-30 {\n  margin-bottom: 30px; }\n\n.ml-30 {\n  margin-left: 30px; }\n\n.my-30 {\n  margin-top: 30px;\n  margin-bottom: 30px; }\n\n.mx-30 {\n  margin-right: 30px;\n  margin-left: 30px; }\n\n.m-31 {\n  margin: 31px; }\n\n.mt-31 {\n  margin-top: 31px; }\n\n.mr-31 {\n  margin-right: 31px; }\n\n.mb-31 {\n  margin-bottom: 31px; }\n\n.ml-31 {\n  margin-left: 31px; }\n\n.my-31 {\n  margin-top: 31px;\n  margin-bottom: 31px; }\n\n.mx-31 {\n  margin-right: 31px;\n  margin-left: 31px; }\n\n.m-32 {\n  margin: 32px; }\n\n.mt-32 {\n  margin-top: 32px; }\n\n.mr-32 {\n  margin-right: 32px; }\n\n.mb-32 {\n  margin-bottom: 32px; }\n\n.ml-32 {\n  margin-left: 32px; }\n\n.my-32 {\n  margin-top: 32px;\n  margin-bottom: 32px; }\n\n.mx-32 {\n  margin-right: 32px;\n  margin-left: 32px; }\n\n.m-33 {\n  margin: 33px; }\n\n.mt-33 {\n  margin-top: 33px; }\n\n.mr-33 {\n  margin-right: 33px; }\n\n.mb-33 {\n  margin-bottom: 33px; }\n\n.ml-33 {\n  margin-left: 33px; }\n\n.my-33 {\n  margin-top: 33px;\n  margin-bottom: 33px; }\n\n.mx-33 {\n  margin-right: 33px;\n  margin-left: 33px; }\n\n.m-34 {\n  margin: 34px; }\n\n.mt-34 {\n  margin-top: 34px; }\n\n.mr-34 {\n  margin-right: 34px; }\n\n.mb-34 {\n  margin-bottom: 34px; }\n\n.ml-34 {\n  margin-left: 34px; }\n\n.my-34 {\n  margin-top: 34px;\n  margin-bottom: 34px; }\n\n.mx-34 {\n  margin-right: 34px;\n  margin-left: 34px; }\n\n.m-35 {\n  margin: 35px; }\n\n.mt-35 {\n  margin-top: 35px; }\n\n.mr-35 {\n  margin-right: 35px; }\n\n.mb-35 {\n  margin-bottom: 35px; }\n\n.ml-35 {\n  margin-left: 35px; }\n\n.my-35 {\n  margin-top: 35px;\n  margin-bottom: 35px; }\n\n.mx-35 {\n  margin-right: 35px;\n  margin-left: 35px; }\n\n.m-36 {\n  margin: 36px; }\n\n.mt-36 {\n  margin-top: 36px; }\n\n.mr-36 {\n  margin-right: 36px; }\n\n.mb-36 {\n  margin-bottom: 36px; }\n\n.ml-36 {\n  margin-left: 36px; }\n\n.my-36 {\n  margin-top: 36px;\n  margin-bottom: 36px; }\n\n.mx-36 {\n  margin-right: 36px;\n  margin-left: 36px; }\n\n.m-37 {\n  margin: 37px; }\n\n.mt-37 {\n  margin-top: 37px; }\n\n.mr-37 {\n  margin-right: 37px; }\n\n.mb-37 {\n  margin-bottom: 37px; }\n\n.ml-37 {\n  margin-left: 37px; }\n\n.my-37 {\n  margin-top: 37px;\n  margin-bottom: 37px; }\n\n.mx-37 {\n  margin-right: 37px;\n  margin-left: 37px; }\n\n.m-38 {\n  margin: 38px; }\n\n.mt-38 {\n  margin-top: 38px; }\n\n.mr-38 {\n  margin-right: 38px; }\n\n.mb-38 {\n  margin-bottom: 38px; }\n\n.ml-38 {\n  margin-left: 38px; }\n\n.my-38 {\n  margin-top: 38px;\n  margin-bottom: 38px; }\n\n.mx-38 {\n  margin-right: 38px;\n  margin-left: 38px; }\n\n.m-39 {\n  margin: 39px; }\n\n.mt-39 {\n  margin-top: 39px; }\n\n.mr-39 {\n  margin-right: 39px; }\n\n.mb-39 {\n  margin-bottom: 39px; }\n\n.ml-39 {\n  margin-left: 39px; }\n\n.my-39 {\n  margin-top: 39px;\n  margin-bottom: 39px; }\n\n.mx-39 {\n  margin-right: 39px;\n  margin-left: 39px; }\n\n.m-40 {\n  margin: 40px; }\n\n.mt-40 {\n  margin-top: 40px; }\n\n.mr-40 {\n  margin-right: 40px; }\n\n.mb-40 {\n  margin-bottom: 40px; }\n\n.ml-40 {\n  margin-left: 40px; }\n\n.my-40 {\n  margin-top: 40px;\n  margin-bottom: 40px; }\n\n.mx-40 {\n  margin-right: 40px;\n  margin-left: 40px; }\n\n.absolute-full {\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0; }\n", ""]);
 
 // exports
 
@@ -29657,12 +29748,12 @@ exports.push([module.i, "html {\n  font-family: Arial, sans-serif;\n  font-size:
 /* 207 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(36)(undefined);
+exports = module.exports = __webpack_require__(26)(undefined);
 // imports
 
 
 // module
-exports.push([module.i, ".react-dom-markdown-editor * {\n  box-sizing: border-box; }\n\n.react-dom-markdown-editor > .react-dom-markdown-editor-workspace {\n  display: flex;\n  flex-direction: row; }\n  .react-dom-markdown-editor > .react-dom-markdown-editor-workspace > * {\n    flex: 1;\n    border: 1px solid #e4e4e4;\n    padding: 10px;\n    overflow: auto; }\n\n.react-dom-markdown-editor textarea {\n  width: 100%;\n  box-sizing: border-box; }\n\n.react-dom-markdown-editor .react-dom-markdown-editor-preview {\n  overflow: auto; }\n", ""]);
+exports.push([module.i, ".react-dom-markdown-editor {\n  flex: auto;\n  display: flex;\n  flex-direction: column; }\n  .react-dom-markdown-editor .react-tabs {\n    flex: auto;\n    display: flex;\n    flex-direction: column; }\n    .react-dom-markdown-editor .react-tabs .react-tabs__tab-panel.react-tabs__tab-panel--selected {\n      flex: auto;\n      overflow: auto;\n      display: flex;\n      flex-direction: column; }\n      .react-dom-markdown-editor .react-tabs .react-tabs__tab-panel.react-tabs__tab-panel--selected .react-dom-markdown-editor-textarea,\n      .react-dom-markdown-editor .react-tabs .react-tabs__tab-panel.react-tabs__tab-panel--selected .react-dom-markdown-editor-preview {\n        height: auto !important;\n        flex: 1; }\n  .react-dom-markdown-editor .react-dom-markdown-editor-workspace {\n    flex: auto; }\n    .react-dom-markdown-editor .react-dom-markdown-editor-workspace .react-dom-markdown-editor-textarea,\n    .react-dom-markdown-editor .react-dom-markdown-editor-workspace .react-dom-markdown-editor-preview {\n      height: auto !important;\n      flex: 1; }\n", ""]);
 
 // exports
 
@@ -29671,7 +29762,21 @@ exports.push([module.i, ".react-dom-markdown-editor * {\n  box-sizing: border-bo
 /* 208 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(36)(undefined);
+exports = module.exports = __webpack_require__(26)(undefined);
+// imports
+
+
+// module
+exports.push([module.i, ".react-dom-markdown-editor * {\n  box-sizing: border-box; }\n\n.react-dom-markdown-editor > .react-dom-markdown-editor-workspace {\n  display: flex;\n  flex-direction: row; }\n\n.react-dom-markdown-editor .react-dom-markdown-editor-textarea,\n.react-dom-markdown-editor .react-dom-markdown-editor-preview {\n  flex: 1;\n  border: 1px solid #e4e4e4;\n  padding: 10px;\n  overflow: auto; }\n\n.react-dom-markdown-editor .react-dom-markdown-editor-textarea {\n  width: 100%;\n  box-sizing: border-box; }\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 209 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(26)(undefined);
 // imports
 
 
@@ -29682,10 +29787,10 @@ exports.push([module.i, ".react-tabs__tab-list {\n  border-bottom: 1px solid #aa
 
 
 /***/ }),
-/* 209 */
+/* 210 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(36)(undefined);
+exports = module.exports = __webpack_require__(26)(undefined);
 // imports
 
 

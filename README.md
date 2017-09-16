@@ -77,39 +77,38 @@ class App extends React.Component {
 
 ### Props
 
-- `height`: integer = 200
+- **height** `PropTypes.oneOfType([ PropTypes.string, PropTypes.number ])`
+
+    `Default`: `'auto'`
 
     Initial height of the textarea. The textarea and preview window will resize together
 
-- `value`: string = ''
+- **value** `PropTypes.string`
+
+    `Default`: `''`
 
     Initial value of the input
 
-- `toolbar`: [`tool`]
+- **marked_options** `PropTypes.object`
+
+    `Default`: `{}`
+
+    Options to pass to `marked.setOptions`
 
     ```
-    [
-      {
-        label: 'h1', // use html to set html instead of using a button
-        handler: (data, cb) => { cb({ wrap: { start: '# ', end: '' }}) }
-      }
-    ]
+    marked.setOptions(marked_options)
     ```
 
-    Array of tools to show above the editor that allow for custom value inserting
-
-    The tools should have a `label` or `html` key to define what is displayed for the tool
-
-    `tool.label` would be rendered inside a button
+- **toolbar**
 
     ```
-    <button>{tool.label}</button>
-    ```
-
-    `tool.html` would be rendered as the element
-
-    ```
-    <span dangerouslySetInnerHTML={ { __html: {tool.html} } ...></span>
+    PropTypes.arrayOf(PropTypes.shape({
+      className: PropTypes.string,
+      html:      PropTypes.string,
+      label:     PropTypes.string,
+      handler:   PropTypes.func.isRequired,
+      is_file:   PropTypes.bool
+    }))
     ```
 
     `tool.handler` will be called with 2 arguments `data`, `cb`
@@ -162,3 +161,72 @@ class App extends React.Component {
       file: File
     }
     ```
+
+- **tabs** `PropTypes.bool`
+
+    `Default`: `false`
+
+    use `true` to show as tabs with a `Markdown` and `Preview` tab
+
+- **onChange** `PropTypes.func`
+
+    callback function which will receive the markdown string value when it changes
+
+    ```
+    onChange={(value) => {
+      this.setState({
+        value: value
+      });
+    }}
+    ```
+
+
+- **markdown_tab_label** `PropTypes.string`
+
+  `Default`: `Markdown`
+
+- **preview_tab_label** `PropTypes.string`
+
+  `Default`: `Preview`
+
+### CSS / Styling
+
+`react-dom-markdown-editor` comes with some basic styling to get you going
+
+#### Base
+
+To have the base styling for side by side view and what not
+
+```
+import 'react-dom-markdown-editor/styles/base.css';
+```
+
+#### Flex
+
+To have the `MarkdownEditor` `flex: auto` you must import that `flex.css`
+
+```
+import 'react-dom-markdown-editor/styles/flex.css';
+```
+
+> Note: The parent element must have something like `display: flex; flex-direction: column` for this to do anything
+
+#### Markdown Style
+
+To use a somewhat standard markdown CSS
+
+```
+import 'react-dom-markdown-editor/styles/markdown/standard.css';
+```
+
+### Development
+
+```
+git clone git@github.com:stevenkaspar/react-dom-markdown-editor.git
+cd react-dom-markdown-editor
+npm install
+npm run dev
+...
+npm run build
+// create pull request
+```
