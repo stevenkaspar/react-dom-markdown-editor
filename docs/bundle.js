@@ -12208,7 +12208,7 @@ var App = function (_React$Component) {
               _react2.default.createElement(
                 'button',
                 { className: 'btn mr-10', onClick: function onClick() {
-                    return App.htmlToPdf('<div class="react-dom-markdown-editor-preview">' + (0, _marked2.default)(_this2.state.value) + ('<style>' + styles[_this2.state.markdown_style] + '</style>') + '</div>');
+                    return App.htmlToPdf('<div class="react-dom-markdown-editor-preview">' + (0, _marked2.default)(_this2.state.value) + ('<style>' + styles[_this2.state.markdown_style] + '</style>') + '</div>', document.querySelector('.react-dom-markdown-editor-preview').scrollHeight + 100, document.querySelector('.react-dom-markdown-editor-preview').scrollWidth + 10);
                   } },
                 'download PDF'
               ),
@@ -12365,7 +12365,7 @@ var App = function (_React$Component) {
     }
   }, {
     key: 'htmlToPdf',
-    value: function htmlToPdf(html) {
+    value: function htmlToPdf(html, height, width) {
 
       var html2pdf = function html2pdf(html, pdf, callback) {
         var canvas = pdf.canvas;
@@ -12410,10 +12410,13 @@ var App = function (_React$Component) {
         };
         canvas.annotations = pdf.annotations;
 
-        pdf.context2d._pageBreakAt = function (y) {
-          this.pageBreaks.push(y);
-        };
+        // pdf.context2d.pageWrapXEnabled = true;
+        pdf.context2d.pageWrapYEnabled = true;
 
+        // pdf.context2d._pageBreakAt = function(y) {
+        // 	this.pageBreaks.push(y);
+        // };
+        //
         pdf.context2d._gotoPage = function (pageOneBased) {
           while (pdf.internal.getNumberOfPages() < pageOneBased) {
             pdf.addPage();
@@ -12426,7 +12429,7 @@ var App = function (_React$Component) {
           html = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
 
           var iframe = document.createElement('iframe');
-          //iframe.style.width = canvas.width;
+          iframe.style.width = canvas.width + 'px';
           //iframe.src = "";
           //iframe.document.domain =
           document.body.appendChild(iframe);
@@ -12469,6 +12472,7 @@ var App = function (_React$Component) {
       };
 
       var pdf = new _jspdf2.default('p', 'pt', 'letter');
+
       pdf.canvas.height = 72 * 11;
       pdf.canvas.width = 72 * 8.5;
 
@@ -29794,7 +29798,7 @@ exports = module.exports = __webpack_require__(26)(undefined);
 
 
 // module
-exports.push([module.i, ".react-dom-markdown-editor-preview {\n  font-family: Arial, sans-serif; }\n  .react-dom-markdown-editor-preview h1, .react-dom-markdown-editor-preview h2, .react-dom-markdown-editor-preview h3, .react-dom-markdown-editor-preview h4, .react-dom-markdown-editor-preview h5, .react-dom-markdown-editor-preview h6 {\n    margin-bottom: 10px; }\n  .react-dom-markdown-editor-preview hr {\n    margin: 10px 0px; }\n  .react-dom-markdown-editor-preview p {\n    padding-bottom: 10px; }\n  .react-dom-markdown-editor-preview img {\n    max-width: 100%; }\n  .react-dom-markdown-editor-preview code {\n    background: #eeeeee;\n    border: 1px solid gainsboro;\n    color: #a50000;\n    border-radius: 4px;\n    padding: 0px 4px; }\n  .react-dom-markdown-editor-preview pre code {\n    padding: 8px;\n    display: block;\n    margin-bottom: 10px; }\n  .react-dom-markdown-editor-preview ol {\n    padding-left: 0;\n    margin-left: 25px;\n    list-style-type: decimal; }\n  .react-dom-markdown-editor-preview ul {\n    padding-left: 0;\n    margin-left: 25px;\n    list-style-type: disc; }\n  .react-dom-markdown-editor-preview blockquote {\n    padding: 10px;\n    margin-bottom: 10px;\n    margin-left: 0px;\n    border-left: 3px solid #78a6c7;\n    background: #e0f2ff; }\n    .react-dom-markdown-editor-preview blockquote p:last-child {\n      padding-bottom: 0px; }\n  .react-dom-markdown-editor-preview table {\n    display: block;\n    width: 100%;\n    overflow: auto;\n    padding-bottom: 10px;\n    border-collapse: collapse; }\n    .react-dom-markdown-editor-preview table th {\n      font-weight: 600;\n      padding: 6px 13px;\n      border: 1px solid #dfe2e5; }\n    .react-dom-markdown-editor-preview table td {\n      padding: 6px 13px;\n      border: 1px solid #dfe2e5; }\n    .react-dom-markdown-editor-preview table tr {\n      background-color: #fff;\n      border-top: 1px solid #c6cbd1; }\n      .react-dom-markdown-editor-preview table tr:nth-child(2n) {\n        background-color: #f6f8fa; }\n    .react-dom-markdown-editor-preview table img {\n      background-color: transparent; }\n", ""]);
+exports.push([module.i, ".react-dom-markdown-editor-preview {\n  font-family: Arial, sans-serif; }\n  .react-dom-markdown-editor-preview h1, .react-dom-markdown-editor-preview h2, .react-dom-markdown-editor-preview h3, .react-dom-markdown-editor-preview h4, .react-dom-markdown-editor-preview h5, .react-dom-markdown-editor-preview h6 {\n    margin-bottom: 10px; }\n  .react-dom-markdown-editor-preview hr {\n    margin: 10px 0px; }\n  .react-dom-markdown-editor-preview p {\n    padding-bottom: 10px; }\n  .react-dom-markdown-editor-preview img {\n    max-width: 100%; }\n  .react-dom-markdown-editor-preview code {\n    background: #eeeeee;\n    border: 1px solid gainsboro;\n    color: #a50000;\n    border-radius: 4px;\n    padding: 0px 4px; }\n  .react-dom-markdown-editor-preview pre code {\n    padding: 8px;\n    display: block;\n    margin-bottom: 10px;\n    white-space: pre-wrap; }\n  .react-dom-markdown-editor-preview ol {\n    padding-left: 0;\n    margin-left: 25px;\n    list-style-type: decimal; }\n  .react-dom-markdown-editor-preview ul {\n    padding-left: 0;\n    margin-left: 25px;\n    list-style-type: disc; }\n  .react-dom-markdown-editor-preview blockquote {\n    padding: 10px;\n    margin-bottom: 10px;\n    margin-left: 0px;\n    border-left: 3px solid #78a6c7;\n    background: #e0f2ff; }\n    .react-dom-markdown-editor-preview blockquote p:last-child {\n      padding-bottom: 0px; }\n  .react-dom-markdown-editor-preview table {\n    display: block;\n    width: 100%;\n    overflow: auto;\n    padding-bottom: 10px;\n    border-collapse: collapse; }\n    .react-dom-markdown-editor-preview table th {\n      font-weight: 600;\n      padding: 6px 13px;\n      border: 1px solid #dfe2e5; }\n    .react-dom-markdown-editor-preview table td {\n      padding: 6px 13px;\n      border: 1px solid #dfe2e5; }\n    .react-dom-markdown-editor-preview table tr {\n      background-color: #fff;\n      border-top: 1px solid #c6cbd1; }\n      .react-dom-markdown-editor-preview table tr:nth-child(2n) {\n        background-color: #f6f8fa; }\n    .react-dom-markdown-editor-preview table img {\n      background-color: transparent; }\n", ""]);
 
 // exports
 

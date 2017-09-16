@@ -131,7 +131,7 @@ here is some \`inline code\`
               </div>
             </div>
             <div>
-              <button className='btn mr-10' onClick={() => App.htmlToPdf('<div class="react-dom-markdown-editor-preview">'+marked(this.state.value) + `<style>${styles[this.state.markdown_style]}</style>`+'</div>')}>download PDF</button>
+              <button className='btn mr-10' onClick={() => App.htmlToPdf('<div class="react-dom-markdown-editor-preview">'+marked(this.state.value) + `<style>${styles[this.state.markdown_style]}</style>`+'</div>', document.querySelector('.react-dom-markdown-editor-preview').scrollHeight + 100, document.querySelector('.react-dom-markdown-editor-preview').scrollWidth + 10)}>download PDF</button>
               <button className='btn' onClick={() => App.copyTextToClipboard(marked(this.state.value))}>copy HTML output</button>
             </div>
           </div>
@@ -221,7 +221,7 @@ here is some \`inline code\`
     document.body.removeChild(textArea);
   }
 
-  static htmlToPdf(html){
+  static htmlToPdf(html, height, width){
 
     let html2pdf  = (html, pdf, callback) => {
     	var canvas = pdf.canvas;
@@ -266,10 +266,13 @@ here is some \`inline code\`
     	};
     	canvas.annotations = pdf.annotations;
 
-    	pdf.context2d._pageBreakAt = function(y) {
-    		this.pageBreaks.push(y);
-    	};
+      // pdf.context2d.pageWrapXEnabled = true;
+      pdf.context2d.pageWrapYEnabled = true;
 
+    	// pdf.context2d._pageBreakAt = function(y) {
+    	// 	this.pageBreaks.push(y);
+    	// };
+      //
     	pdf.context2d._gotoPage = function(pageOneBased) {
     		while (pdf.internal.getNumberOfPages() < pageOneBased) {
     			pdf.addPage();
@@ -282,7 +285,7 @@ here is some \`inline code\`
     		html = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
 
     		var iframe = document.createElement('iframe');
-    		//iframe.style.width = canvas.width;
+    		iframe.style.width = canvas.width  + 'px';
     		//iframe.src = "";
     		//iframe.document.domain =
     		document.body.appendChild(iframe);
@@ -327,14 +330,14 @@ here is some \`inline code\`
     }
 
 	  var pdf = new jsPDF('p', 'pt', 'letter');
+
 	  pdf.canvas.height = 72 * 11;
-	  pdf.canvas.width = 72 * 8.5;
+	  pdf.canvas.width =  72 * 8.5;
 
-	  html2pdf(html, pdf, function(pdf){
+
+    html2pdf(html, pdf, function(pdf){
       pdf.save('react-dom-markdown-editor.pdf', 'datauristring');
-	  });
-
-
+    });
   }
 
 
