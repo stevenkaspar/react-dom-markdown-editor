@@ -110,7 +110,7 @@ here is some \`inline code\`
         <div className='flex-column absolute-full'>
           <header className='flex-none text-right p-4'>
             <h1>React Markdown Editor</h1>
-            <span>{'<'}♥{'/>'} by <a href='https://www.linkedin.com/in/stevenkaspar/' target='_blank'>Steven Kaspar</a></span>
+            <span>{'<'}{'/>'} by <a href='https://www.linkedin.com/in/stevenkaspar/' target='_blank'>Steven Kaspar</a></span>
           </header>
           <div className='flex-none flex-row justify-content-between py-10 px-4 bg-gray-darkest mb-4'>
             <div>

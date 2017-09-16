@@ -12117,7 +12117,6 @@ var App = function (_React$Component) {
               'span',
               null,
               '<',
-              '\u2665',
               '/>',
               ' by ',
               _react2.default.createElement(
