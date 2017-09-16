@@ -2,6 +2,8 @@ import React          from 'react';
 import ReactDOM       from 'react-dom';
 import marked         from 'marked';
 import MarkdownEditor from '../src/MarkdownEditor';
+import jsPDF          from 'jspdf';
+import html2canvas    from 'html2canvas';
 
 
 let styles = {
@@ -77,46 +79,234 @@ here is some \`inline code\`
       <div>
         <style>{styles.app}</style>
         <style>{styles.base}</style>
-        <h1>React Markdown Editor</h1>
-        <div>
-          <strong>Views</strong>
-          <button className={`btn radio-btn ${this.state.view === 'basic' ? 'selected' : ''}`} onClick={() => this.setState({ view: 'basic' })}>Side by Side</button>
-          <button className={`btn radio-btn ${this.state.view === 'tabs' ? 'selected' : ''}`} onClick={() => this.setState({ view: 'tabs' })}>Tabs</button><br/>
-          <br/>
-          <strong>Markdown Style</strong>
-          <button className={`btn radio-btn ${this.state.markdown_style === 'standard' ? 'selected' : ''}`} onClick={() => this.setState({ markdown_style: 'standard' })}>Standard</button>
-          <button className={`btn radio-btn ${this.state.markdown_style === null ? 'selected' : ''}`} onClick={() => this.setState({ markdown_style: null })}>None</button><br/>
-          <style>{styles[this.state.markdown_style]}</style>
+        <div className='flex-column absolute-full'>
+          <header className='flex-none text-right p-4'>
+            <h1>React Markdown Editor</h1>
+          </header>
+          <div className='flex-none flex-row justify-content-between py-10 px-4'>
+            <div>
+              <div className='radio-group mr-10'>
+                <label>View</label>
+                <button className={`btn radio-btn ${this.state.view === 'basic' ? 'selected' : ''}`} onClick={() => this.setState({ view: 'basic' })}>Side by Side</button>
+                <button className={`btn radio-btn ${this.state.view === 'tabs' ? 'selected' : ''}`} onClick={() => this.setState({ view: 'tabs' })}>Tabs</button>
+              </div>
+              <div className='radio-group'>
+                <label>Markdown Style</label>
+                <button className={`btn radio-btn ${this.state.markdown_style === 'standard' ? 'selected' : ''}`} onClick={() => this.setState({ markdown_style: 'standard' })}>Standard</button>
+                <button className={`btn radio-btn ${this.state.markdown_style === null ? 'selected' : ''}`} onClick={() => this.setState({ markdown_style: null })}>None</button>
+              </div>
+            </div>
+            <div>
+              <button className='btn mr-10' onClick={() => App.htmlToPdf('<div class="react-dom-markdown-editor-preview">'+marked(this.state.value) + `<style>${styles[this.state.markdown_style]}</style>`+'</div>')}>download PDF</button>
+              <button className='btn' onClick={() => App.copyTextToClipboard(marked(this.state.value))}>copy HTML output</button>
+            </div>
+            <style>{styles[this.state.markdown_style]}</style>
+          </div>
+          <div className='flex-auto overflow-auto'>
+          {
+            this.state.view === 'basic' ?
+            <div>
+              <MarkdownEditor
+                height={400}
+                toolbar={toolbar}
+                value={this.state.value}
+                onChange={this.markdownEditorChange}/>
+            </div>
+              : null
+          }
+          {
+            this.state.view === 'tabs' ?
+            <div>
+              <style>{styles.tabs}</style>
+              <MarkdownEditor
+                height={400}
+                tabs={true}
+                toolbar={toolbar}
+                value={this.state.value}
+                onChange={this.markdownEditorChange}/>
+            </div>
+              : null
+          }
+          </div>
         </div>
-        {
-          this.state.view === 'basic' ?
-          <div>
-            <MarkdownEditor
-              height={400}
-              toolbar={toolbar}
-              value={this.state.value}
-              onChange={this.markdownEditorChange}/>
-          </div>
-            : null
-        }
-        {
-          this.state.view === 'tabs' ?
-          <div>
-            <style>{styles.tabs}</style>
-            <MarkdownEditor
-              height={400}
-              tabs={true}
-              toolbar={toolbar}
-              value={this.state.value}
-              onChange={this.markdownEditorChange}/>
-          </div>
-            : null
-        }
-        <button onClick={() => alert(this.state.value)}>alert input value</button>
-        <button onClick={() => alert(marked(this.state.value))}>alert HTML output</button>
       </div>
-    );
+    )
   }
+
+
+  static copyTextToClipboard(text) {
+    var textArea = document.createElement("textarea");
+
+    //
+    // *** This styling is an extra step which is likely not required. ***
+    //
+    // Why is it here? To ensure:
+    // 1. the element is able to have focus and selection.
+    // 2. if element was to flash render it has minimal visual impact.
+    // 3. less flakyness with selection and copying which **might** occur if
+    //    the textarea element is not visible.
+    //
+    // The likelihood is the element won't even render, not even a flash,
+    // so some of these are just precautions. However in IE the element
+    // is visible whilst the popup box asking the user for permission for
+    // the web page to copy to the clipboard.
+    //
+
+    // Place in top-left corner of screen regardless of scroll position.
+    textArea.style.position = 'fixed';
+    textArea.style.top = 0;
+    textArea.style.left = 0;
+
+    // Ensure it has a small width and height. Setting to 1px / 1em
+    // doesn't work as this gives a negative w/h on some browsers.
+    textArea.style.width = '2em';
+    textArea.style.height = '2em';
+
+    // We don't need padding, reducing the size if it does flash render.
+    textArea.style.padding = 0;
+
+    // Clean up any borders.
+    textArea.style.border = 'none';
+    textArea.style.outline = 'none';
+    textArea.style.boxShadow = 'none';
+
+    // Avoid flash of white box if rendered for any reason.
+    textArea.style.background = 'transparent';
+
+
+    textArea.value = text;
+
+    document.body.appendChild(textArea);
+
+    textArea.select();
+
+    try {
+      var successful = document.execCommand('copy');
+      var msg = successful ? 'successful' : 'unsuccessful';
+      alert('Copying text command was ' + msg);
+    } catch (err) {
+      alert('Oops, unable to copy');
+    }
+
+    document.body.removeChild(textArea);
+  }
+
+  static htmlToPdf(html){
+
+    let html2pdf  = (html, pdf, callback) => {
+    	var canvas = pdf.canvas;
+    	if (!canvas) {
+    		alert('jsPDF canvas plugin not installed');
+    		return;
+    	}
+    	canvas.pdf = pdf;
+    	pdf.annotations = {
+
+    		_nameMap : [],
+
+    		createAnnotation : function(href,bounds) {
+    			var x = pdf.context2d._wrapX(bounds.left);
+    			var y = pdf.context2d._wrapY(bounds.top);
+    			var page = pdf.context2d._page(bounds.top);
+    			var options;
+    			var index = href.indexOf('#');
+    			if (index >= 0) {
+    				options = {
+    					name : href.substring(index + 1)
+    				};
+    			} else {
+    				options = {
+    					url : href
+    				};
+    			}
+    			pdf.link(x, y, bounds.right - bounds.left, bounds.bottom - bounds.top, options);
+    		},
+
+    		setName : function(name,bounds) {
+    			var x = pdf.context2d._wrapX(bounds.left);
+    			var y = pdf.context2d._wrapY(bounds.top);
+    			var page = pdf.context2d._page(bounds.top);
+    			this._nameMap[name] = {
+    				page : page,
+    				x : x,
+    				y : y
+    			};
+    		}
+
+    	};
+    	canvas.annotations = pdf.annotations;
+
+    	pdf.context2d._pageBreakAt = function(y) {
+    		this.pageBreaks.push(y);
+    	};
+
+    	pdf.context2d._gotoPage = function(pageOneBased) {
+    		while (pdf.internal.getNumberOfPages() < pageOneBased) {
+    			pdf.addPage();
+    		}
+    		pdf.setPage(pageOneBased);
+    	}
+
+    	if (typeof html === 'string') {
+    		// remove all scripts
+    		html = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+
+    		var iframe = document.createElement('iframe');
+    		//iframe.style.width = canvas.width;
+    		//iframe.src = "";
+    		//iframe.document.domain =
+    		document.body.appendChild(iframe);
+    		var doc;
+    		doc = iframe.contentDocument;
+    		if (doc == undefined || doc == null) {
+    			doc = iframe.contentWindow.document;
+    		}
+    		//iframe.setAttribute('style', 'position:absolute;right:0; top:0; bottom:0; height:100%; width:500px');
+
+    		doc.open();
+    		doc.write(html);
+    		doc.close();
+
+    		var promise = html2canvas(doc.body, {
+    			canvas : canvas,
+    			onrendered : function(canvas) {
+    				if (callback) {
+    					if (iframe) {
+    						iframe.parentElement.removeChild(iframe);
+    					}
+    					callback(pdf);
+    				}
+    			}
+    		});
+
+    	} else {
+    		var body = html;
+    		var promise = html2canvas(body, {
+    			canvas : canvas,
+    			onrendered : function(canvas) {
+    				if (callback) {
+    					if (iframe) {
+    						iframe.parentElement.removeChild(iframe);
+    					}
+    					callback(pdf);
+    				}
+    			}
+    		});
+    	}
+
+    }
+
+	  var pdf = new jsPDF('p', 'pt', 'letter');
+	  pdf.canvas.height = 72 * 11;
+	  pdf.canvas.width = 72 * 8.5;
+
+	  html2pdf(html, pdf, function(pdf){
+      pdf.save('react-dom-markdown-editor.pdf', 'datauristring');
+	  });
+
+
+  }
+
 
 };
 
