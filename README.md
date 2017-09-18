@@ -96,19 +96,19 @@ class App extends React.Component {
     Options to pass to `marked.setOptions`
 
     ```
-    marked.setOptions(marked_options)
+marked.setOptions(marked_options)
     ```
 
 - **toolbar**
 
     ```
-    PropTypes.arrayOf(PropTypes.shape({
-      className: PropTypes.string,
-      html:      PropTypes.string,
-      label:     PropTypes.string,
-      handler:   PropTypes.func.isRequired,
-      is_file:   PropTypes.bool
-    }))
+PropTypes.arrayOf(PropTypes.shape({
+    className: PropTypes.string,
+    html:      PropTypes.string,
+    label:     PropTypes.string,
+    handler:   PropTypes.func.isRequired,
+    is_file:   PropTypes.bool
+}))
     ```
 
     `tool.handler` will be called with 2 arguments `data`, `cb`
@@ -116,17 +116,17 @@ class App extends React.Component {
     `data`
 
     ```
-    {
-      value: '',        //current value,
-      selection: {
-        value: '',      // selection value,
-        start: 0,       // selection start index,
-        end:   10       // selection end index
-      },
-      target: textarea, // HTML DOM Element
-      files: []         // if is_file: true
-    }
-    ```
+{
+    value: '',        //current value,
+    selection: {
+      value: '',      // selection value,
+      start: 0,       // selection start index,
+      end:   10       // selection end index
+    },
+    target: textarea, // HTML DOM Element
+    files: []         // if is_file: true
+}
+   ```
 
     `cb`
 
@@ -135,31 +135,31 @@ class App extends React.Component {
     To set a new value execute the cb with
 
     ```
-    // set the value to xxx. This is useful for async needs
-    cb({
-      new_value: 'xxx'
-    })
+// set the value to xxx. This is useful for async needs
+cb({
+    new_value: 'xxx'
+})
     ```
 
     To wrap the selection execute the cb with
 
     ```
-    // create a link making the selection the link target
-    cb({
-      wrap: {
-        start: '[Display Text](', /* selection here */ end: ')'
-      }
-    })
+// create a link making the selection the link target
+cb({
+    wrap: {
+      start: '[Display Text](', /* selection here */ end: ')'
+    }
+})
     ```
 
     `tool.is_file` if true then on click the browsers file selector will be shown and the cb will include a `files` key which will be an array of file data
 
     ```
-    {
-      file_name: 'xxx.png',
-      data: base64 String,
-      file: File
-    }
+{
+    file_name: 'xxx.png',
+    data: base64 String,
+    file: File
+}
     ```
 
 - **tabs** `PropTypes.bool`
@@ -173,11 +173,11 @@ class App extends React.Component {
     callback function which will receive the markdown string value when it changes
 
     ```
-    onChange={(value) => {
-      this.setState({
-        value: value
-      });
-    }}
+onChange={(value) => {
+    this.setState({
+      value: value
+    });
+}}
     ```
 
 

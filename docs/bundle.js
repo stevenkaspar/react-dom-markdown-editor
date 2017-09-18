@@ -25001,7 +25001,7 @@ var MarkdownEditor = function (_React$Component) {
       var selection = MarkdownEditor.getInputSelection(this.textarea);
 
       return {
-        value: this.textarea.innerHTML,
+        value: this.textarea.value,
         selection: _extends({}, selection, {
           _: selection
         }),

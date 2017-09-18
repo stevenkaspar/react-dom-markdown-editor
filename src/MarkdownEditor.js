@@ -29,7 +29,7 @@ class MarkdownEditor extends React.Component {
     let selection = MarkdownEditor.getInputSelection(this.textarea);
 
     return {
-      value:     this.textarea.innerHTML,
+      value:     this.textarea.value,
       selection: {
         ...selection,
         _:     selection
